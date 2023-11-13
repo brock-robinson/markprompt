@@ -1,4 +1,4 @@
-import { FileSectionReference } from '@markprompt/core';
+import { FileReferenceFileData, FileSectionReference } from '@markprompt/core';
 import * as Accordion from '@radix-ui/react-accordion';
 import * as Dialog from '@radix-ui/react-dialog';
 import cn from 'classnames';
@@ -17,10 +17,16 @@ import { MarkdownContainer } from '@/components/emails/templates/MarkdownContain
 import { JSONViewer } from '@/components/ui/JSONViewer';
 import { SkeletonTable } from '@/components/ui/Skeletons';
 import { Tag } from '@/components/ui/Tag';
+import { getFileIdBySourceAndPath } from '@/lib/api';
 import { formatShortDateTimeInTimeZone } from '@/lib/date';
 import useProject from '@/lib/hooks/use-project';
 import { fetcher } from '@/lib/utils';
-import { DbConversation, PromptQueryStatFull } from '@/types/types';
+import {
+  DbConversation,
+  DbFile,
+  Project,
+  PromptQueryStatFull,
+} from '@/types/types';
 
 const Loading = <p className="p-4 text-sm text-neutral-500">Loading...</p>;
 
@@ -29,25 +35,33 @@ const EditorDialog = dynamic(() => import('@/components/files/EditorDialog'), {
 });
 
 type MessageResponseCardProps = {
+  projectId: Project['id'];
   queryStat: PromptQueryStatFull;
   showFeedback: boolean;
   highlighted: boolean;
   setEditorOpen: (open: boolean) => void;
-  setOpenFileData: ({
-    path,
+  setOpenFileReferenceData: ({
+    fileReferenceData,
     sectionSlug,
   }: {
-    path: string;
+    fileReferenceData: FileReferenceFileData;
     sectionSlug?: string | undefined;
   }) => void;
 };
 
-export const MessageResponseCard = forwardRef<
+const MessageResponseCard = forwardRef<
   HTMLDivElement | undefined,
   MessageResponseCardProps
 >(
   (
-    { queryStat, showFeedback, highlighted, setEditorOpen, setOpenFileData },
+    {
+      projectId,
+      queryStat,
+      showFeedback,
+      highlighted,
+      setEditorOpen,
+      setOpenFileReferenceData,
+    },
     ref,
   ) => {
     const [showReferences, setShowReferences] = useState(false);
@@ -116,9 +130,9 @@ export const MessageResponseCard = forwardRef<
                           <button
                             className="rounded-md border border-neutral-900 bg-neutral-1100 py-1 px-2 text-sm font-medium text-neutral-300"
                             key={`reference-${f.file?.path}-${f.meta?.leadHeading?.slug}-${i}`}
-                            onClick={() => {
-                              setOpenFileData({
-                                path: f.file.path,
+                            onClick={async () => {
+                              setOpenFileReferenceData({
+                                fileReferenceData: f.file,
                                 sectionSlug: f.meta?.leadHeading?.slug,
                               });
                               setEditorOpen(true);
@@ -164,8 +178,12 @@ const ConversationDialog: FC<ConversationDialogProps> = ({
       : null,
     fetcher<PromptQueryStatFull[] | undefined>,
   );
-  const [openFileData, setOpenFileData] = useState<
-    { path: string; sectionSlug?: string | undefined } | undefined
+  const [openFileData, setOpenFileReferenceData] = useState<
+    | {
+        fileReferenceData: FileReferenceFileData;
+        sectionSlug?: string | undefined;
+      }
+    | undefined
   >(undefined);
   const [editorOpen, setEditorOpen] = useState<boolean>(false);
   const highlightedRef = useRef();
@@ -207,6 +225,10 @@ const ConversationDialog: FC<ConversationDialogProps> = ({
       }
     }, 200);
   }, [sourceQueryStatId, firstQueryStat]);
+
+  if (!project?.id) {
+    return <></>;
+  }
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -318,7 +340,7 @@ const ConversationDialog: FC<ConversationDialogProps> = ({
                       sortedConversations.length > 1 &&
                       queryStat.id === sourceQueryStatId;
                     return (
-                      <>
+                      <div key={`conversation-${queryStat.id}-${i}`}>
                         {isHighlighted && (
                           <div
                             ref={highlightedRef as any}
@@ -329,13 +351,14 @@ const ConversationDialog: FC<ConversationDialogProps> = ({
                         )}
                         <MessageResponseCard
                           key={`${conversationId}-${i}`}
+                          projectId={project.id}
                           queryStat={queryStat}
                           showFeedback={sortedConversations.length > 1}
                           highlighted={isHighlighted}
                           setEditorOpen={setEditorOpen}
-                          setOpenFileData={setOpenFileData}
+                          setOpenFileReferenceData={setOpenFileReferenceData}
                         />
-                      </>
+                      </div>
                     );
                   })}
                 </div>
@@ -345,7 +368,7 @@ const ConversationDialog: FC<ConversationDialogProps> = ({
         </Dialog.Content>
       </Dialog.Portal>
       <EditorDialog
-        filePath={openFileData?.path}
+        fileReferenceData={openFileData?.fileReferenceData}
         highlightSectionSlug={openFileData?.sectionSlug}
         open={editorOpen}
         setOpen={(open) => {

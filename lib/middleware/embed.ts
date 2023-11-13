@@ -2,7 +2,7 @@ import LZString from 'lz-string';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { MARKPROMPT_JS_PACKAGE_VERSIONS } from '../constants';
-import { getApiUrl } from '../utils.edge';
+import { getApiUrl } from '../utils.nodeps';
 
 export default async function EmbedMiddleware(req: NextRequest) {
   const params = JSON.parse(

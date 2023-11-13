@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { ReactNode, useState } from 'react';
 
 import Button from '@/components/ui/Button';
-import { CodePanel } from '@/components/ui/Code';
+import { CodePanel } from '@/components/ui/CodePanel';
 import { Note } from '@/components/ui/Note';
 import { MARKPROMPT_JS_PACKAGE_VERSIONS } from '@/lib/constants';
 import {
@@ -28,7 +28,7 @@ import {
   ThemeDimensions,
 } from '@/lib/themes';
 import { pruneEmpty, propsObjectToJSXPropsString } from '@/lib/utils.browser';
-import { getAppOrigin } from '@/lib/utils.edge';
+import { getAppOrigin } from '@/lib/utils.nodeps';
 import { Project, SerializableMarkpromptOptions, DbTeam } from '@/types/types';
 
 import { getRootTextSize } from './prose';
@@ -250,7 +250,6 @@ const getDescription = (
   teamSlug: string,
   projectSlug: string,
   isTestMode: boolean,
-  isOnboarding: boolean,
 ) => {
   if (isTestMode) {
     return (
@@ -267,16 +266,12 @@ const getDescription = (
         Showing code with your <strong>production</strong> key. Production keys
         can only be used when called from a whitelisted domain. You can add
         whitelisted domains in the{' '}
-        {!isOnboarding ? (
-          <Link
-            className="subtle-underline"
-            href={`/${teamSlug}/${projectSlug}/settings`}
-          >
-            project settings
-          </Link>
-        ) : (
-          <>project settings</>
-        )}
+        <Link
+          className="subtle-underline"
+          href={`/${teamSlug}/${projectSlug}/settings`}
+        >
+          project settings
+        </Link>
         . For local development, use a test key (toggle &ldquo;Test mode&rdquo;
         above).
       </>
@@ -288,42 +283,30 @@ export const TestKeyNote = ({
   team,
   project,
   testMode,
-  isOnboarding,
   className,
 }: {
   team: DbTeam;
   project: Project;
   testMode: boolean;
-  isOnboarding: boolean;
   className: string;
 }) => {
   return (
     <Note type="warning" size="sm" className={className}>
-      {getDescription(team.slug, project.slug, testMode, isOnboarding)}
+      {getDescription(team.slug, project.slug, testMode)}
     </Note>
   );
 };
 
-const GetCode = ({
-  isOnboarding,
-  children,
-}: {
-  isOnboarding: boolean;
-  children: ReactNode;
-}) => {
+const GetCode = ({ children }: { children: ReactNode }) => {
   const { team } = useTeam();
   const { project } = useProject();
   const { markpromptOptions, theme } = useConfigContext();
   const [testMode, setTestMode] = useState(false);
   const [codeDialogOpen, setCodeDialogOpen] = useState(false);
 
-  if (!team || !project) {
-    return <></>;
-  }
-
   const apiKey = testMode
-    ? project.private_dev_api_key
-    : project.public_api_key;
+    ? project?.private_dev_api_key
+    : project?.public_api_key;
 
   const diffTheme: Partial<Theme> = getDiffTheme(theme);
   const themeCSS = getThemeCSS(diffTheme);
@@ -334,283 +317,287 @@ const GetCode = ({
       <Dialog.Portal>
         <Dialog.Overlay className="animate-overlay-appear dialog-overlay" />
         <Dialog.Content className="animate-dialog-slide-in dialog-content flex h-[90%] max-h-[800px] w-[90%] max-w-[700px] flex-col">
-          <Dialog.Title className="dialog-title-xl flex flex-none flex-row items-center gap-4">
-            <div className="flex-grow truncate">Copy code</div>
-            <Button
-              variant="plain"
-              buttonSize="sm"
-              target="_blank"
-              href="/docs"
-              Icon={Book}
-            >
-              Docs
-            </Button>
-            <div className="flex flex-none flex-row items-center gap-2">
-              <label
-                className="flex-grow truncate text-sm font-normal text-neutral-500"
-                htmlFor="product-updates"
-              >
-                Test mode
-              </label>
-              <Switch.Root
-                className="switch-root"
-                id="test-mode"
-                checked={testMode}
-                onCheckedChange={setTestMode}
-              >
-                <Switch.Thumb className="switch-thumb" />
-              </Switch.Root>
-            </div>
-          </Dialog.Title>
-          <Dialog.Description className="dialog-description-xl mt-2 flex-none border-b border-neutral-900 pb-4">
-            Use the code below in your HTML pages or web application.
-          </Dialog.Description>
-          <div className="flex h-full w-full flex-grow p-6">
-            <Tabs.Root className="tabs-root" defaultValue="react">
-              <Tabs.List className="tabs-list" aria-label="Get code">
-                <Tabs.Trigger className="tabs-trigger" value="react">
-                  React
-                </Tabs.Trigger>
-                <Tabs.Trigger className="tabs-trigger" value="vanilla">
-                  Vanilla JS
-                </Tabs.Trigger>
-                <Tabs.Trigger className="tabs-trigger" value="docusaurus">
-                  Docusaurus
-                </Tabs.Trigger>
-                <Tabs.Trigger className="tabs-trigger" value="scriptTag">
-                  Script tag
-                </Tabs.Trigger>
-                <Tabs.Trigger className="tabs-trigger" value="embed">
-                  Embed
-                </Tabs.Trigger>
-              </Tabs.List>
-              <Tabs.Content
-                className="tabs-content relative w-full max-w-full flex-grow"
-                value="react"
-              >
-                <div className="prose prose-invert absolute inset-x-0 top-4 bottom-0 w-full max-w-full overflow-y-auto py-4">
-                  <h3>Installation</h3>
-                  <CodePanel
-                    className="w-full"
-                    language="bash"
-                    code="npm install @markprompt/react @markprompt/css react"
-                  />
-                  <h3>Usage</h3>
-                  <TestKeyNote
-                    className="mb-4"
-                    team={team}
-                    project={project}
-                    testMode={testMode}
-                    isOnboarding={isOnboarding}
-                  />
-                  <CodePanel
-                    language="jsx"
-                    code={reactCode(apiKey, testMode, markpromptOptions)}
-                    noPreWrap
-                  />
-                  <Note type="info" size="sm" className="mt-4">
-                    The Markprompt React component also comes as a headless
-                    component, for full customization options.{' '}
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      className="subtle-underline"
-                      href="https://github.com/motifland/markprompt-js/tree/main/packages/react#api"
-                    >
-                      Read more
-                    </a>{' '}
-                    →
-                  </Note>
-                  {themeCSS && (
-                    <>
-                      <h4>CSS</h4>
+          {team && project && apiKey && (
+            <>
+              <Dialog.Title className="dialog-title-xl flex flex-none flex-row items-center gap-4">
+                <div className="flex-grow truncate">Copy code</div>
+                <Button
+                  variant="plain"
+                  buttonSize="sm"
+                  target="_blank"
+                  href="/docs"
+                  Icon={Book}
+                >
+                  Docs
+                </Button>
+                <div className="flex flex-none flex-row items-center gap-2">
+                  <label
+                    className="flex-grow truncate text-sm font-normal text-neutral-500"
+                    htmlFor="product-updates"
+                  >
+                    Test mode
+                  </label>
+                  <Switch.Root
+                    className="switch-root"
+                    id="test-mode"
+                    checked={testMode}
+                    onCheckedChange={setTestMode}
+                  >
+                    <Switch.Thumb className="switch-thumb" />
+                  </Switch.Root>
+                </div>
+              </Dialog.Title>
+              <Dialog.Description className="dialog-description-xl mt-2 flex-none border-b border-neutral-900 pb-4">
+                Use the code below in your HTML pages or web application.
+              </Dialog.Description>
+              <div className="flex h-full w-full flex-grow p-6">
+                <Tabs.Root className="tabs-root" defaultValue="react">
+                  <Tabs.List className="tabs-list" aria-label="Get code">
+                    <Tabs.Trigger className="tabs-trigger" value="react">
+                      React
+                    </Tabs.Trigger>
+                    <Tabs.Trigger className="tabs-trigger" value="vanilla">
+                      Vanilla JS
+                    </Tabs.Trigger>
+                    <Tabs.Trigger className="tabs-trigger" value="docusaurus">
+                      Docusaurus
+                    </Tabs.Trigger>
+                    <Tabs.Trigger className="tabs-trigger" value="scriptTag">
+                      Script tag
+                    </Tabs.Trigger>
+                    <Tabs.Trigger className="tabs-trigger" value="embed">
+                      Embed
+                    </Tabs.Trigger>
+                  </Tabs.List>
+                  <Tabs.Content
+                    className="tabs-content relative w-full max-w-full flex-grow"
+                    value="react"
+                  >
+                    <div className="prose prose-invert absolute inset-x-0 top-4 bottom-0 w-full max-w-full overflow-y-auto py-4">
+                      <h3>Installation</h3>
+                      <CodePanel
+                        className="w-full"
+                        language="bash"
+                        code="npm install @markprompt/react @markprompt/css react"
+                      />
+                      <h3>Usage</h3>
+                      <TestKeyNote
+                        className="mb-4"
+                        team={team}
+                        project={project}
+                        testMode={testMode}
+                      />
+                      <CodePanel
+                        language="jsx"
+                        code={reactCode(apiKey, testMode, markpromptOptions)}
+                        noPreWrap
+                      />
+                      <Note type="info" size="sm" className="mt-4">
+                        The Markprompt React component also comes as a headless
+                        component, for full customization options.{' '}
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          className="subtle-underline"
+                          href="https://github.com/motifland/markprompt-js/tree/main/packages/react#api"
+                        >
+                          Read more
+                        </a>{' '}
+                        →
+                      </Note>
+                      {themeCSS && (
+                        <>
+                          <h4>CSS</h4>
+                          <p className="text-sm text-neutral-300">
+                            In CSS, add the following custom variables.
+                          </p>
+                          <CodePanel
+                            className="w-full"
+                            language="css"
+                            code={themeCSS}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </Tabs.Content>
+                  <Tabs.Content
+                    className="tabs-content relative w-full max-w-full flex-grow"
+                    value="vanilla"
+                  >
+                    <div className="prose prose-invert absolute inset-x-0 top-4 bottom-0 w-full max-w-full overflow-y-auto py-4">
+                      <h3>Installation</h3>
+                      <CodePanel
+                        className="w-full"
+                        language="markup"
+                        code="npm install @markprompt/web @markprompt/css"
+                      />
+                      <h3>Usage</h3>
+                      <TestKeyNote
+                        className="mb-4"
+                        team={team}
+                        project={project}
+                        testMode={testMode}
+                      />
+                      <h4>HTML</h4>
                       <p className="text-sm text-neutral-300">
-                        In CSS, add the following custom variables.
+                        Place a container with id <code>markprompt</code> in
+                        your page.
                       </p>
                       <CodePanel
                         className="w-full"
-                        language="css"
-                        code={themeCSS}
+                        language="javascript"
+                        code={`<div id="markprompt" />`}
                       />
-                    </>
-                  )}
-                </div>
-              </Tabs.Content>
-              <Tabs.Content
-                className="tabs-content relative w-full max-w-full flex-grow"
-                value="vanilla"
-              >
-                <div className="prose prose-invert absolute inset-x-0 top-4 bottom-0 w-full max-w-full overflow-y-auto py-4">
-                  <h3>Installation</h3>
-                  <CodePanel
-                    className="w-full"
-                    language="markup"
-                    code="npm install @markprompt/web @markprompt/css"
-                  />
-                  <h3>Usage</h3>
-                  <TestKeyNote
-                    className="mb-4"
-                    team={team}
-                    project={project}
-                    testMode={testMode}
-                    isOnboarding={isOnboarding}
-                  />
-                  <h4>HTML</h4>
-                  <p className="text-sm text-neutral-300">
-                    Place a container with id <code>markprompt</code> in your
-                    page.
-                  </p>
-                  <CodePanel
-                    className="w-full"
-                    language="javascript"
-                    code={`<div id="markprompt" />`}
-                  />
-                  <h4>JavaScript</h4>
-                  <p className="text-sm text-neutral-300">
-                    In JavaScript, call the code below, which will attach the
-                    interactive prompt to the <code>markprompt</code> container.
-                  </p>
-                  <CodePanel
-                    className="w-full"
-                    language="javascript"
-                    code={vanillaCode(apiKey, 'markprompt', markpromptOptions)}
-                  />
-                  {themeCSS && (
-                    <>
-                      <h4>CSS</h4>
+                      <h4>JavaScript</h4>
                       <p className="text-sm text-neutral-300">
-                        In CSS, add the following custom variables.
+                        In JavaScript, call the code below, which will attach
+                        the interactive prompt to the <code>markprompt</code>{' '}
+                        container.
                       </p>
                       <CodePanel
                         className="w-full"
-                        language="css"
-                        code={themeCSS}
+                        language="javascript"
+                        code={vanillaCode(
+                          apiKey,
+                          'markprompt',
+                          markpromptOptions,
+                        )}
                       />
-                    </>
-                  )}
-                </div>
-              </Tabs.Content>
-              <Tabs.Content
-                className="tabs-content relative w-full max-w-full flex-grow"
-                value="docusaurus"
-              >
-                <div className="prose prose-invert absolute inset-x-0 top-4 bottom-0 w-full max-w-full overflow-y-auto py-4">
-                  <h3>Installation</h3>
-                  <CodePanel
-                    className="w-full"
-                    language="markup"
-                    code="npm install @markprompt/docusaurus-theme-search"
-                  />
-                  <h3>Usage</h3>
-                  <TestKeyNote
-                    className="mb-4"
-                    team={team}
-                    project={project}
-                    testMode={testMode}
-                    isOnboarding={isOnboarding}
-                  />
-                  <h4>Configuration</h4>
-                  <p className="text-sm text-neutral-300">
-                    In your <code>docusaurus.config.js</code>, add{' '}
-                    <code>@markprompt/docusaurus-theme-search</code> to themes.
-                    Configure <code>markprompt</code> in the{' '}
-                    <code>themeConfig</code>.
-                  </p>
-                  <CodePanel
-                    className="w-full"
-                    language="javascript"
-                    code={docusaurusCode(apiKey, markpromptOptions)}
-                  />
-                  <Note type="info" size="sm" className="mt-4">
-                    <p className="pb-2">
-                      If your Docusaurus project already has a search plugin,
-                      such as <code>theme-search-algolia</code>, you need to
-                      swizzle the current search plugin, and add Markprompt as a
-                      standalone component.{' '}
-                      <a
-                        target="_blank"
-                        rel="noreferrer"
-                        className="subtle-underline"
-                        href="https://github.com/motifland/markprompt-js/tree/main/packages/docusaurus-theme-search#usage-with-another-search-plugin"
-                      >
-                        Read more
-                      </a>{' '}
-                      →
-                    </p>
-                    <p>
-                      Alternatively, you can use Algolia directly in the
-                      Markprompt component, by toggling on &ldquo;Instant
-                      search&rdquo; and selecting Algolia as provider.
-                    </p>
-                  </Note>
-                  {themeCSS && (
-                    <>
-                      <h4>CSS</h4>
+                      {themeCSS && (
+                        <>
+                          <h4>CSS</h4>
+                          <p className="text-sm text-neutral-300">
+                            In CSS, add the following custom variables.
+                          </p>
+                          <CodePanel
+                            className="w-full"
+                            language="css"
+                            code={themeCSS}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </Tabs.Content>
+                  <Tabs.Content
+                    className="tabs-content relative w-full max-w-full flex-grow"
+                    value="docusaurus"
+                  >
+                    <div className="prose prose-invert absolute inset-x-0 top-4 bottom-0 w-full max-w-full overflow-y-auto py-4">
+                      <h3>Installation</h3>
+                      <CodePanel
+                        className="w-full"
+                        language="markup"
+                        code="npm install @markprompt/docusaurus-theme-search"
+                      />
+                      <h3>Usage</h3>
+                      <TestKeyNote
+                        className="mb-4"
+                        team={team}
+                        project={project}
+                        testMode={testMode}
+                      />
+                      <h4>Configuration</h4>
                       <p className="text-sm text-neutral-300">
-                        In CSS, add the following custom variables.
+                        In your <code>docusaurus.config.js</code>, add{' '}
+                        <code>@markprompt/docusaurus-theme-search</code> to
+                        themes. Configure <code>markprompt</code> in the{' '}
+                        <code>themeConfig</code>.
                       </p>
                       <CodePanel
                         className="w-full"
-                        language="css"
-                        code={themeCSS}
+                        language="javascript"
+                        code={docusaurusCode(apiKey, markpromptOptions)}
                       />
-                    </>
-                  )}
-                </div>
-              </Tabs.Content>
-              <Tabs.Content
-                className="tabs-content relative w-full max-w-full flex-grow"
-                value="scriptTag"
-              >
-                <div className="prose prose-invert absolute inset-x-0 top-4 bottom-0 w-full max-w-full overflow-y-auto py-4">
-                  <h3>Usage</h3>
-                  <p className="text-sm text-neutral-300">
-                    Copy the code below to your HTML pages.
-                  </p>
-                  <TestKeyNote
-                    className="mb-4"
-                    team={team}
-                    project={project}
-                    testMode={testMode}
-                    isOnboarding={isOnboarding}
-                  />
-                  <CodePanel
-                    className="w-full"
-                    language="markup"
-                    code={scriptTagCode(
-                      apiKey,
-                      'markprompt',
-                      markpromptOptions,
-                      themeCSS,
-                    )}
-                  />
-                </div>
-              </Tabs.Content>
-              <Tabs.Content
-                className="tabs-content relative w-full max-w-full flex-grow"
-                value="embed"
-              >
-                <div className="prose prose-invert absolute inset-x-0 top-4 bottom-0 w-full max-w-full overflow-y-auto py-4">
-                  <h3>Usage</h3>
-                  <p className="text-sm text-neutral-300">
-                    Copy the code below to your HTML pages.
-                  </p>
-                  <TestKeyNote
-                    className="mb-4"
-                    team={team}
-                    project={project}
-                    testMode={testMode}
-                    isOnboarding={isOnboarding}
-                  />
-                  <CodePanel
-                    className="w-full"
-                    language="markup"
-                    code={embedCode(apiKey, markpromptOptions, themeCSS)}
-                  />
-                </div>
-              </Tabs.Content>
-            </Tabs.Root>
-          </div>
+                      <Note type="info" size="sm" className="mt-4">
+                        <p className="pb-2">
+                          If your Docusaurus project already has a search
+                          plugin, such as <code>theme-search-algolia</code>, you
+                          need to swizzle the current search plugin, and add
+                          Markprompt as a standalone component.{' '}
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            className="subtle-underline"
+                            href="https://github.com/motifland/markprompt-js/tree/main/packages/docusaurus-theme-search#usage-with-another-search-plugin"
+                          >
+                            Read more
+                          </a>{' '}
+                          →
+                        </p>
+                        <p>
+                          Alternatively, you can use Algolia directly in the
+                          Markprompt component, by toggling on &ldquo;Instant
+                          search&rdquo; and selecting Algolia as provider.
+                        </p>
+                      </Note>
+                      {themeCSS && (
+                        <>
+                          <h4>CSS</h4>
+                          <p className="text-sm text-neutral-300">
+                            In CSS, add the following custom variables.
+                          </p>
+                          <CodePanel
+                            className="w-full"
+                            language="css"
+                            code={themeCSS}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </Tabs.Content>
+                  <Tabs.Content
+                    className="tabs-content relative w-full max-w-full flex-grow"
+                    value="scriptTag"
+                  >
+                    <div className="prose prose-invert absolute inset-x-0 top-4 bottom-0 w-full max-w-full overflow-y-auto py-4">
+                      <h3>Usage</h3>
+                      <p className="text-sm text-neutral-300">
+                        Copy the code below to your HTML pages.
+                      </p>
+                      <TestKeyNote
+                        className="mb-4"
+                        team={team}
+                        project={project}
+                        testMode={testMode}
+                      />
+                      <CodePanel
+                        className="w-full"
+                        language="markup"
+                        code={scriptTagCode(
+                          apiKey,
+                          'markprompt',
+                          markpromptOptions,
+                          themeCSS,
+                        )}
+                      />
+                    </div>
+                  </Tabs.Content>
+                  <Tabs.Content
+                    className="tabs-content relative w-full max-w-full flex-grow"
+                    value="embed"
+                  >
+                    <div className="prose prose-invert absolute inset-x-0 top-4 bottom-0 w-full max-w-full overflow-y-auto py-4">
+                      <h3>Usage</h3>
+                      <p className="text-sm text-neutral-300">
+                        Copy the code below to your HTML pages.
+                      </p>
+                      <TestKeyNote
+                        className="mb-4"
+                        team={team}
+                        project={project}
+                        testMode={testMode}
+                      />
+                      <CodePanel
+                        className="w-full"
+                        language="markup"
+                        code={embedCode(apiKey, markpromptOptions, themeCSS)}
+                      />
+                    </div>
+                  </Tabs.Content>
+                </Tabs.Root>
+              </div>
+            </>
+          )}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

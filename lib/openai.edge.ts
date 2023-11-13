@@ -6,6 +6,8 @@ import { CreateEmbeddingResponse, CreateModerationResponse } from 'openai';
 
 import { OpenAIErrorResponse } from '@/types/types';
 
+import { getResponseOrThrow } from './utils';
+
 export interface OpenAIStreamPayload {
   model: string;
   prompt: string;
@@ -32,11 +34,30 @@ export const createModeration = async (
   }).then((r) => r.json());
 };
 
-export const createEmbedding = async (
-  input: string,
+export const createEmbeddings = async (
+  input: string | string[],
   byoOpenAIKey: string | undefined,
   modelId: OpenAIEmbeddingsModelId,
-): Promise<CreateEmbeddingResponse | OpenAIErrorResponse> => {
+): Promise<CreateEmbeddingResponse> => {
+  if (input?.length === 0) {
+    return {
+      object: 'list',
+      model: modelId,
+      data: [],
+      usage: {
+        prompt_tokens: 0,
+        total_tokens: 0,
+      },
+    };
+  }
+
+  let preparedInput;
+  if (typeof input === 'string') {
+    preparedInput = input.trim().replaceAll('\n', ' ');
+  } else {
+    preparedInput = input.map((i) => i.trim().replaceAll('\n', ' '));
+  }
+
   const res = await fetch('https://api.openai.com/v1/embeddings', {
     headers: {
       'Content-Type': 'application/json',
@@ -45,14 +66,15 @@ export const createEmbedding = async (
     method: 'POST',
     body: JSON.stringify({
       model: modelId,
-      input: input.trim().replaceAll('\n', ' '),
+      input: preparedInput,
     }),
   });
 
-  if (!res.ok) {
-    console.error('[createEmbedding] Error', res.statusText);
-    return { error: { message: 'Error generating embedding' } };
+  const jsonRes = await getResponseOrThrow<CreateEmbeddingResponse>(res);
+
+  if ('error' in jsonRes) {
+    throw new Error(JSON.stringify(jsonRes.error));
   }
 
-  return res.json();
+  return jsonRes;
 };

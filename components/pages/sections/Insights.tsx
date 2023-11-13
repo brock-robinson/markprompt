@@ -1,22 +1,10 @@
-import cn from 'classnames';
 import { ChevronsUpDown, SearchIcon } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
 import Balancer from 'react-wrap-balancer';
 
 import { InsightsExample } from '@/components/examples/insights';
 import { MarkpromptIcon } from '@/components/icons/Markprompt';
-import { Blurs } from '@/components/ui/Blurs';
-import Button from '@/components/ui/Button';
-import { ListItem } from '@/components/ui/ListItem';
-import { Segment } from '@/components/ui/Segment';
 import { Slash } from '@/components/ui/Slash';
-import { ContactWindow } from '@/components/user/ChatWindow';
-import {
-  DEFAULT_TIERS,
-  PLACEHOLDER_ENTERPRISE_TIER,
-  Tier,
-} from '@/lib/stripe/tiers';
 
 const InsightsSection = () => {
   return (

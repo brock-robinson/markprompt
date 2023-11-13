@@ -4,6 +4,8 @@ import { FC } from 'react';
 type SkeletonProps = {
   loading?: boolean;
   onDark?: boolean;
+  absolute?: boolean;
+  className?: string;
 };
 
 export const SkeletonTable: FC<SkeletonProps> = ({ loading, onDark }) => {
@@ -23,12 +25,18 @@ export const SkeletonTable: FC<SkeletonProps> = ({ loading, onDark }) => {
   );
 };
 
-export const SkeletonPanel: FC<SkeletonProps> = ({ loading, onDark }) => {
+export const SkeletonPanel: FC<SkeletonProps> = ({
+  loading,
+  onDark,
+  absolute,
+  className,
+}) => {
   return (
     <div
-      className={cn('pointer-events-none absolute inset-0 z-0 transition', {
+      className={cn(className, 'pointer-events-none z-0 transition', {
         'opacity-0': !loading,
         'bg-neutral-1100': onDark,
+        'absolute inset-0': absolute,
       })}
     >
       <div className="loading-skeleton h-full w-full rounded-md bg-neutral-800" />

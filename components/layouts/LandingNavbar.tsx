@@ -31,6 +31,12 @@ export default function LandingNavbar({
       <div className="flex-grow" />
       <Link
         className="hidden transform whitespace-nowrap text-sm font-medium text-white opacity-60 hover:opacity-100 sm:block"
+        href="/about"
+      >
+        About
+      </Link>
+      <Link
+        className="hidden transform whitespace-nowrap text-sm font-medium text-white opacity-60 hover:opacity-100 md:block"
         href="/resources/overview"
       >
         Why Markprompt
@@ -72,7 +78,7 @@ export default function LandingNavbar({
       />
       {session ? (
         <Link
-          className="button-glow hidden flex-row items-center gap-3 rounded-md bg-white px-4 py-2 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-300 sm:flex"
+          className="hidden flex-row items-center gap-3 whitespace-nowrap rounded-md bg-white px-4 py-2 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-300 sm:flex"
           href="/"
         >
           Go to app

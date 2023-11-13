@@ -1,4 +1,4 @@
-import { UserUsageStats } from '@/pages/api/cron/weekly-update-email';
+import { UserUsageStats } from '@/components/insights/UserUsageStats';
 
 export const sampleUserUsageStats: UserUsageStats = {
   teamUsageStats: [

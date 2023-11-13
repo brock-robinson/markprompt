@@ -2,7 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import cn from 'classnames';
 import { Link, RefreshCw } from 'lucide-react';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import Button from '@/components/ui/Button';
 import { CTABar } from '@/components/ui/SettingsCard';
@@ -10,16 +10,14 @@ import { createPromptConfig } from '@/lib/api';
 import { useConfigContext } from '@/lib/context/config';
 import useProject from '@/lib/hooks/use-project';
 import usePromptConfigs from '@/lib/hooks/use-prompt-configs';
-import useTeam from '@/lib/hooks/use-team';
 import { copyToClipboard, generateShareKey } from '@/lib/utils';
-import { getAppOrigin, removeSchema } from '@/lib/utils.edge';
+import { getAppOrigin, removeSchema } from '@/lib/utils.nodeps';
 
 const getShareLink = (shareKey: string) => {
   return `${getAppOrigin()}/s/${shareKey}`;
 };
 
 const Share = ({ children }: { children: ReactNode }) => {
-  const { team } = useTeam();
   const { project } = useProject();
   const { promptConfigs, mutate: mutatePromptConfigs } = usePromptConfigs();
   const [isGeneratingKey, setGeneratingKey] = useState(false);
@@ -56,10 +54,6 @@ const Share = ({ children }: { children: ReactNode }) => {
       generateAndStoreShareKey(generateShareKey());
     }
   }, [shareKey, generateAndStoreShareKey, shareDialogOpen]);
-
-  if (!team || !project) {
-    return <></>;
-  }
 
   return (
     <Dialog.Root open={shareDialogOpen} onOpenChange={setShareDialogOpen}>

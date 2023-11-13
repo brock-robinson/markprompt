@@ -1,0 +1,8 @@
+.grid_1_3 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.grid_1_3 > :nth-child(even) {
+  @apply border;
+  grid-column: 2 / span 3;
+}

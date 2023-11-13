@@ -100,6 +100,11 @@ export type PromptConfig =
 export type DbQueryStat = Database['public']['Tables']['query_stats']['Row'];
 export type DbConversation =
   Database['public']['Tables']['conversations']['Row'];
+export type DbSyncQueue = Database['public']['Tables']['sync_queues']['Row'];
+
+export type NangoSource = Omit<DbSource, 'data'> & {
+  data: NangoSourceDataType;
+};
 
 export type Source = PartialBy<Pick<DbSource, 'type' | 'data'>, 'data'>;
 export type FileData = {
@@ -180,20 +185,41 @@ export type NangoIntegrationId =
   | 'salesforce-knowledge-sandbox'
   | 'salesforce-case'
   | 'salesforce-case-sandbox'
-  | 'notion-pages';
+  | 'notion-pages'
+  | 'website-pages';
+
+// Must match nango.yaml definition. Currently, sync id and integration id
+// are identical.
+export type NangoSyncId = NangoIntegrationId;
+
+export type NangoAction = 'ADDED' | 'UPDATED' | 'DELETED';
 
 type NangoFileMetadata = {
   deleted_at: string | null;
-  last_action: string;
+  last_action: NangoAction;
   first_seen_at: string;
   last_modified_at: string;
 };
 
-export type NangoFileWithMetadata = NangoFile & NangoFileMetadata;
+// nango.yaml does not allow to specify union types, so we have to
+// use strings there. We fix this with the NangoRichFile type
+export type NangoRichFile = Omit<NangoFile, 'contentType'> & {
+  contentType: FileType;
+};
+
+export type NangoFileWithMetadata = NangoRichFile & {
+  _nango_metadata: NangoFileMetadata;
+};
 
 export type NangoSourceDataType = {
   integrationId: NangoIntegrationId;
-  identifier: string;
+  connectionId: string;
+  name: string;
+  connectionConfig?: {
+    instance_url?: string;
+    baseUrl?: string;
+  };
+  syncMetadata?: any;
 };
 
 export type RobotsTxtInfo = { sitemap?: string; disallowedPaths: string[] };
@@ -330,3 +356,31 @@ export type CompletionsUsageInfo = {
 };
 
 export type ChatOutputFormat = 'markdown' | 'slack';
+
+export type DbSyncQueueOverview = Pick<
+  DbSyncQueue,
+  'source_id' | 'created_at' | 'ended_at' | 'status'
+>;
+
+export type DbSyncQueueWithDate = Omit<
+  DbSyncQueueOverview,
+  'created_at' | 'ended_at'
+> & {
+  createdAt: Date;
+  endedAt?: Date | undefined;
+};
+
+export type LogLevel = 'info' | 'debug' | 'error' | 'warn';
+
+export type SourceConfigurationView = 'configuration' | 'logs';
+
+export type SyncData = {
+  integrationId: NangoIntegrationId;
+  connectionId: string;
+  syncId: NangoSyncId;
+};
+
+export type DbFileMetaChecksum = Pick<
+  DbFile,
+  'id' | 'meta' | 'path' | 'checksum'
+>;

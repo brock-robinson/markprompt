@@ -49,6 +49,11 @@ export const formatShortDateTimeInTimeZone = (date: Date) => {
   );
 };
 
+export const formatSystemDateTime = (date: Date) => {
+  // Jun 12, 8:20 PM
+  return formatInTimeZone(date, REFERENCE_TIMEZONE, `MMM d, yyyy, h:mm a`);
+};
+
 export enum FixedDateRange {
   TODAY = 0,
   PAST_7_DAYS = 1,

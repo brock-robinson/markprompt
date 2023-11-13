@@ -1,11 +1,10 @@
-import { InferGetStaticPropsType } from 'next';
+import { GetStaticProps, InferGetStaticPropsType } from 'next';
 import { FC } from 'react';
 
 import LandingPage from '@/components/pages/Landing';
+import { getIndexPageStaticProps } from '@/lib/pages';
 
-import { getStaticProps as _getStaticProps } from './index';
-
-export const getStaticProps = _getStaticProps;
+export const getStaticProps: GetStaticProps = getIndexPageStaticProps;
 
 const Home: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
   stars,

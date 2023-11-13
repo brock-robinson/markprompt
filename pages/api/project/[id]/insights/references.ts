@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { withProjectAccess } from '@/lib/middleware/common';
 import { createServiceRoleSupabaseClient } from '@/lib/supabase';
-import { safeParseInt } from '@/lib/utils.edge';
+import { safeParseInt } from '@/lib/utils.nodeps';
 import { Database } from '@/types/supabase';
 import { Project, ReferenceWithOccurrenceCount } from '@/types/types';
 

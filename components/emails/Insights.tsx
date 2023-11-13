@@ -14,10 +14,9 @@ import cn from 'classnames';
 import { format } from 'date-fns';
 import { FC } from 'react';
 
-import { UserUsageStats } from '@/pages/api/cron/weekly-update-email';
-
 import { Wrapper } from './templates/Shared';
 import { SocialSection } from './templates/SocialSection';
+import { UserUsageStats } from '../insights/UserUsageStats';
 
 type InsightsEmailProps = {
   preview: string;

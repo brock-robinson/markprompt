@@ -1,8 +1,8 @@
 import type { SupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { backOff } from 'exponential-backoff';
 
-import { CONTEXT_TOKENS_CUTOFF, MIN_CONTENT_LENGTH } from '@/lib/constants';
-import { createEmbedding } from '@/lib/openai.edge';
+import { MAX_CHUNK_LENGTH, MIN_SECTION_CONTENT_LENGTH } from '@/lib/constants';
+import { createEmbeddings } from '@/lib/openai.edge';
 import {
   createChecksum,
   getFileType,
@@ -29,17 +29,16 @@ import {
 } from './markdown';
 import { MarkpromptConfig } from './schema';
 import { tokensToApproxParagraphs } from './stripe/tiers';
-import { getTokenAllowanceInfo } from './supabase';
+import { createFile, getTokenAllowanceInfo } from './supabase';
 
-const TOKEN_CUTOFF_ADJUSTED = CONTEXT_TOKENS_CUTOFF * 0.8;
-const APPROX_CHARS_PER_TOKEN = 4;
-const MAX_CHUNK_LENGTH = TOKEN_CUTOFF_ADJUSTED * APPROX_CHARS_PER_TOKEN;
-
-const splitWithinTokenCutoff = (section: string): string[] => {
+export const splitWithinTokenCutoff = (
+  section: string,
+  maxChunkLength: number,
+): string[] => {
   // GPT3Tokenizer is slow, especially on large text. Use the approximated
   // value instead (1 token ~= 4 characters), and add a little extra
   // buffer.
-  if (section.length < MAX_CHUNK_LENGTH) {
+  if (section.length < maxChunkLength) {
     return [section];
   }
 
@@ -48,14 +47,14 @@ const splitWithinTokenCutoff = (section: string): string[] => {
   let accLines = '';
 
   const pushChunk = (accLines: string) => {
-    if (accLines.length < MAX_CHUNK_LENGTH) {
+    if (accLines.length < maxChunkLength) {
       subSections.push(accLines);
     } else {
       // If a single line is longer than the token limit, chunk it
       // up further.
       const lineChunks = splitIntoSubstringsOfMaxLength(
         accLines,
-        MAX_CHUNK_LENGTH,
+        maxChunkLength,
       );
       for (const chunk of lineChunks) {
         subSections.push(chunk);
@@ -66,7 +65,7 @@ const splitWithinTokenCutoff = (section: string): string[] => {
   for (const line of lines) {
     const accLinesLength = accLines.length;
     const lineLength = line.length;
-    if (accLinesLength + lineLength >= MAX_CHUNK_LENGTH) {
+    if (accLinesLength + lineLength >= maxChunkLength) {
       pushChunk(accLines);
       accLines = line;
     } else {
@@ -98,7 +97,7 @@ const processFileData = async (
       fileSectionsData = markdownToFileSectionData(
         file.content,
         true,
-        markpromptConfig,
+        markpromptConfig.processorOptions,
       );
     } catch (e) {
       // Some repos use the .md extension for Markdoc, and this
@@ -122,7 +121,10 @@ const processFileData = async (
   const trimmedSectionsData: FileSectionData[] =
     fileSectionsData.sections.flatMap(
       (sectionData: FileSectionData): FileSectionData[] => {
-        const split = splitWithinTokenCutoff(sectionData.content);
+        const split = splitWithinTokenCutoff(
+          sectionData.content,
+          MAX_CHUNK_LENGTH,
+        );
         return split.map((s, i) => ({
           content: s,
           leadHeading: i === 0 ? sectionData.leadHeading : undefined,
@@ -155,41 +157,6 @@ const getFileAtPath = async (
   if (error) {
     console.error('Error:', error);
     return undefined;
-  }
-  return data?.id as DbFile['id'];
-};
-
-const createFile = async (
-  supabase: SupabaseClient<Database>,
-  // TODO: remove once migration is safely completed. We set an explicit
-  // value to prevent NULL values, because if a row has a NULL value,
-  // somehow it won't be returned in the inner joined filter query.
-  _projectId: Project['id'],
-  sourceId: DbSource['id'],
-  path: string,
-  meta: any,
-  internalMetadata: any,
-  checksum: string,
-  rawContent: string,
-): Promise<DbFile['id'] | undefined> => {
-  const { error, data } = await supabase
-    .from('files')
-    .insert([
-      {
-        source_id: sourceId,
-        project_id: _projectId,
-        path,
-        meta,
-        internal_metadata: internalMetadata,
-        checksum,
-        raw_content: rawContent,
-      },
-    ])
-    .select('id')
-    .limit(1)
-    .maybeSingle();
-  if (error) {
-    throw error;
   }
   return data?.id as DbFile['id'];
 };
@@ -311,8 +278,8 @@ export const generateFileEmbeddingsAndSaveFile = async (
     // prompt.
     const input = section.content;
 
-    // Ignore content shorter than `MIN_CONTENT_LENGTH` characters.
-    if (input.length < MIN_CONTENT_LENGTH) {
+    // Ignore content shorter than `MIN_SECTION_CONTENT_LENGTH` characters.
+    if (input.length < MIN_SECTION_CONTENT_LENGTH) {
       continue;
     }
 
@@ -320,7 +287,7 @@ export const generateFileEmbeddingsAndSaveFile = async (
       // Retry with exponential backoff in case of error. Typical cause is
       // too_many_requests.
       const embeddingResult = await backOff(
-        () => createEmbedding(input, byoOpenAIKey, model.value),
+        () => createEmbeddings(input, byoOpenAIKey, model.value),
         {
           startingDelay: 10000,
           numOfAttempts: 10,

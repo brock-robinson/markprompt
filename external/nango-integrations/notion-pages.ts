@@ -3,11 +3,13 @@ import type { NangoSync, NangoFile } from './models';
 
 export default async function fetchData(nango: NangoSync) {
   const pages = (
-    await paginate(nango, 'post', '/v1/search', 'Notion pages', 100, true)
+    await paginate(nango, 'post', '/v1/search', 'Notion pages', 100)
   ).filter((result: any) => result.object === 'page');
 
   const batchSize = 10;
   await nango.log(`Found ${pages.length} new/updated Notion pages to sync.`);
+
+  const records: NangoFile[] = [];
 
   for (let i = 0; i < pages.length; i += batchSize) {
     await nango.log(
@@ -16,11 +18,21 @@ export default async function fetchData(nango: NangoSync) {
       } (total pages: ${pages.length})`,
     );
     const batchOfPages = pages.slice(i, Math.min(pages.length, i + batchSize));
-    const pagesWithPlainText = await Promise.all(
+    const mappedRecords = await Promise.all(
       batchOfPages.map(async (page: any) => mapPage(nango, page)),
     );
-    await nango.batchSave(pagesWithPlainText, 'NangoFile');
+
+    for (const mappedRecord of mappedRecords) {
+      records.push(mappedRecord);
+    }
   }
+
+  // Important: we have enabled track_deletes, which means that everything
+  // that is not present in `batchSave` calls within a sync run will be deleted.
+  // Therefore, we need to call `batchSave` only once. Otherwise, if the
+  // script fails after a few calls to `batchSave`, everything else will be
+  // deleted. We'd rather the script fails and doesn't delete any data.
+  await nango.batchSave(records, 'NangoFile');
 }
 
 const fetchAsMarkdown = async (
@@ -51,12 +63,11 @@ const paginate = async (
   method: 'get' | 'post',
   endpoint: string,
   desc: string,
-  pageSize = 100,
-  incremental = false,
+  pageSize: number,
 ) => {
   let cursor: string | undefined;
   let pageCounter = 0;
-  let results: any[] = [];
+  const results: any[] = [];
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
@@ -76,25 +87,12 @@ const paginate = async (
         method === 'get'
           ? ({ page_size: `${pageSize}`, start_cursor: cursor } as any)
           : {},
-      retries: 10, // Exponential backoff + long-running job = handles rate limits well.
+      // Exponential backoff + long-running job = handles rate limits well:
+      retries: 10,
     });
 
-    if (
-      incremental &&
-      nango.lastSyncDate &&
-      res.data.results.length &&
-      new Date(res.data.results[res.data.results.length - 1].last_edited_time) <
-        nango.lastSyncDate
-    ) {
-      results = results.concat(
-        res.data.results.filter(
-          (result: any) =>
-            new Date(result.last_edited_time) >= nango.lastSyncDate!,
-        ),
-      );
-      break;
-    } else {
-      results = results.concat(res.data.results);
+    for (const r of res.data.results) {
+      results.push(r);
     }
 
     if (!res.data.has_more || !res.data.next_cursor) {
@@ -466,6 +464,7 @@ const mapPage = async (nango: NangoSync, page: any): Promise<NangoFile> => {
       last_edited_time: page.last_edited_time,
       properties,
     },
+    error: undefined,
   };
 };
 

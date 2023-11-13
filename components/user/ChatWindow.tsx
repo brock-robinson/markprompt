@@ -10,7 +10,7 @@ import {
 } from 'formik';
 import { MessageSquare, X } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import emitter, { EVENT_OPEN_PROMPT, EVENT_OPEN_CONTACT } from '@/lib/events';
 import useSystemStatus from '@/lib/hooks/use-system-status';
@@ -186,7 +186,7 @@ export const ContactWindow = ({
                   </Button>
                 </CTABar>
                 <div className="flex flex-row items-center gap-4 border-t border-neutral-900 px-4 py-4">
-                  <p className="mb-1 flex-grow text-xs font-medium text-neutral-300">
+                  <p className="mb-1 flex-grow text-xs text-neutral-300">
                     Want to skip the form and speak with an expert?
                   </p>
                   <Button

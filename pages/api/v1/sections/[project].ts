@@ -11,7 +11,7 @@ import {
   getTeamTierInfo,
 } from '@/lib/supabase';
 import { buildSectionReferenceFromMatchResult } from '@/lib/utils';
-import { isRequestFromMarkprompt } from '@/lib/utils.edge';
+import { isRequestFromMarkprompt } from '@/lib/utils.nodeps';
 import {
   ApiError,
   FileSectionMatchResult,

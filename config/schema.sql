@@ -51,11 +51,11 @@ comment on table public.projects is 'Projects within a team.';
 create type source_type as enum ('github', 'motif', 'website', 'nango', 'file-upload', 'api-upload');
 
 create table public.sources (
-  id          uuid primary key default uuid_generate_v4(),
-  inserted_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  project_id  uuid references public.projects on delete cascade not null,
-  type        source_type not null,
-  data        jsonb
+  id                        uuid primary key default uuid_generate_v4(),
+  inserted_at               timestamp with time zone default timezone('utc'::text, now()) not null,
+  project_id                uuid references public.projects on delete cascade not null,
+  type                      source_type not null,
+  data                      jsonb
 );
 comment on table public.sources is 'Data sources for a project.';
 
@@ -182,6 +182,20 @@ create table public.query_stats_usage (
   normalized_token_count int
 );
 comment on table public.query_stats_usage is 'Usage.';
+
+-- Sync queues
+create type sync_status as enum ('running', 'errored', 'canceled', 'complete');
+
+-- Sync queues
+create table public.sync_queues (
+  id              uuid primary key default uuid_generate_v4(),
+  created_at      timestamp with time zone default timezone('utc'::text, now()) not null,
+  ended_at        timestamp with time zone,
+  source_id       uuid references public.sources on delete cascade not null,
+  status          sync_status not null,
+  logs            jsonb[] not null default array[]::jsonb[]
+);
+comment on table public.sync_queues is 'Sync queues.';
 
 -- Functions
 
@@ -726,6 +740,59 @@ begin
   set query_stat_id = null
   where query_stat_id = old.id;
   return old;
+end;
+$$;
+
+-- Append logs to sync queues
+
+create or replace function append_log_to_sync_queue(
+  id uuid,
+  entry jsonb
+)
+returns void
+language plpgsql
+as $$
+begin
+  update sync_queues
+    set logs = logs || append_log_to_sync_queue.entry
+    where sync_queues.id = append_log_to_sync_queue.id;
+end;
+$$;
+
+-- Get latest sync queues in project
+
+create or replace function get_latest_sync_queues(
+  project_id uuid
+)
+returns table (
+  id uuid,
+  source_id uuid,
+  status sync_status,
+  created_at timestamp with time zone,
+  ended_at timestamp with time zone
+)
+language plpgsql
+as $$
+begin
+  return query
+  with rankedsyncqueues as (
+    select
+        sq.id as id, sq.source_id as source_id, sq.status as status, sq.created_at as created_at, sq.ended_at as ended_at,
+        -- sq.id, sq.created_at, sq.ended_at, sq.source_id, sq.status,
+        row_number() over(partition by sq.source_id order by sq.created_at desc) as rn
+    from
+        sync_queues sq
+    join
+        sources s on sq.source_id = s.id
+    where
+        s.project_id = get_latest_sync_queues.project_id
+  )
+  select
+    rankedsyncqueues.id, rankedsyncqueues.source_id, rankedsyncqueues.status, rankedsyncqueues.created_at, rankedsyncqueues.ended_at
+  from
+    rankedsyncqueues
+  where
+    rankedsyncqueues.rn = 1;
 end;
 $$;
 
@@ -1344,7 +1411,7 @@ create policy "Users can delete conversations associated to projects they have a
     )
   );
 
--- Conversations
+-- Query stats usage
 
 alter table query_stats_usage
   enable row level security;
@@ -1366,6 +1433,11 @@ create policy "Users can delete query stats usage associated to teams they are m
       and memberships.team_id = query_stats_usage.team_id
     )
   );
+
+-- Sync queues
+
+alter table sync_queues
+  enable row level security;
 
 -- Privileges
 

@@ -2,3 +2,4 @@ types/supabase.ts
 .next/
 node_modules/
 coverage/
+external/nango-integrations/models.ts

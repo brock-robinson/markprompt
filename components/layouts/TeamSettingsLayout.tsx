@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { FC, useMemo } from 'react';
 
 import useTeam from '@/lib/hooks/use-team';
@@ -5,13 +6,14 @@ import useTeam from '@/lib/hooks/use-team';
 import { NavSubtabsLayout, NavSubtabsLayoutProps } from './NavSubtabsLayout';
 
 export const TeamSettingsLayout: FC<NavSubtabsLayoutProps> = (props) => {
+  const router = useRouter();
   const { team } = useTeam();
 
   const subTabItems = useMemo(() => {
-    if (!team?.slug) {
+    if (!router.query?.team) {
       return undefined;
     }
-    const basePath = `/${team?.slug || ''}`;
+    const basePath = `/${router.query.team || ''}`;
     return [
       { label: 'Home', href: basePath },
       ...(!team?.is_personal
@@ -21,7 +23,7 @@ export const TeamSettingsLayout: FC<NavSubtabsLayoutProps> = (props) => {
       { label: 'Plans', href: `/settings${basePath}/plans` },
       { label: 'Settings', href: `/settings${basePath}` },
     ];
-  }, [team?.slug, team?.is_personal]);
+  }, [router.query?.team, team?.is_personal]);
 
   return <NavSubtabsLayout {...props} subTabItems={subTabItems} />;
 };

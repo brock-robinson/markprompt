@@ -4,30 +4,35 @@ import { NextRequest, NextResponse } from 'next/server';
 import { matchesGlobs } from '../utils';
 
 export const PUBLIC_NON_ROUTED_API_PATHS = [
+  '/.netlify/functions/inngest',
+  '/.redwood/functions/inngest',
+  '/api/inngest',
   '/api/oauth',
   '/api/subscriptions/webhook',
-  '/api/webhooks/nango/sync',
   '/api/support/contact',
+  '/api/webhooks/nango/sync',
+  '/x/inngest',
 ];
 
 const UNAUTHED_PATHS = [
   '/',
-  '/home',
-  '/docs',
+  '/about',
   '/blog',
+  '/blog/**/*',
+  '/docs',
+  '/home',
+  '/embed/*',
   '/integrations',
   '/integrations/**/*',
-  '/blog/**/*',
-  '/login',
-  '/login/email',
-  '/login/confirm',
-  '/login/accept-invite',
-  '/login/confirm-signup',
-  '/signup',
-  '/resources/**/*',
   '/legal/**/*',
+  '/login',
+  '/login/accept-invite',
+  '/login/confirm',
+  '/login/confirm-signup',
+  '/login/email',
+  '/resources/**/*',
   '/s/*',
-  '/embed/*',
+  '/signup',
   ...PUBLIC_NON_ROUTED_API_PATHS,
 ];
 

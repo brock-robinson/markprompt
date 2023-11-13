@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import 'css.css';
+@import 'animations.css';
 @import 'ui.css';
 @import 'prism.css';
 @import 'markprompt.css';
@@ -57,6 +59,10 @@ a {
   @apply rounded-md border border-neutral-900 p-3 text-xs;
 }
 
+.prose :where(thead):not(:where([class~='not-prose'] *)) {
+  @apply border-b border-neutral-800;
+}
+
 /*
  * To investigate: ReactMarkdown generates a <pre> within a <pre>
  * when using the custom {code} component mapping. We only want
@@ -85,7 +91,7 @@ textarea {
 }
 
 .input-base {
-  @apply flex appearance-none rounded-md border bg-neutral-900 text-neutral-100 transition duration-200 placeholder:text-neutral-500;
+  @apply flex appearance-none rounded-md border bg-neutral-900 text-neutral-100 transition duration-200 placeholder:text-neutral-500 disabled:cursor-not-allowed disabled:text-neutral-500;
 }
 
 .input-base-noborder {
@@ -202,7 +208,7 @@ textarea {
 .accordion-content-alt[data-state='closed'] {
   animation-name: expand-height;
   animation-direction: reverse;
-  animation-duration: 300ms;
+  animation-duration: 400ms;
   animation-fill-mode: both;
   transition-timing-function: ease-in-out;
 }
@@ -342,11 +348,11 @@ textarea {
 }
 
 .dropdown-menu-content {
-  @apply z-40 overflow-hidden rounded-md border border-neutral-800 bg-neutral-900;
+  @apply z-40 mt-[-3px] flex flex-col rounded-md border border-neutral-800 bg-neutral-900;
 }
 
 .dropdown-menu-item {
-  @apply relative cursor-pointer border-0 py-2 text-sm text-neutral-300 outline-none transition hover:bg-neutral-800;
+  @apply relative flex-none cursor-pointer border-0 py-2 text-sm text-neutral-300 outline-none transition hover:bg-neutral-800;
 }
 
 .dropdown-menu-item-noindent {
@@ -362,7 +368,7 @@ textarea {
 }
 
 .dropdown-menu-separator {
-  @apply h-[1px] bg-neutral-800;
+  @apply h-[1px] flex-none bg-neutral-800;
 }
 
 .dropdown-menu-button {
@@ -370,11 +376,11 @@ textarea {
 }
 
 .dialog-overlay {
-  @apply fixed inset-0 bg-black/80;
+  @apply fixed inset-0 z-20 bg-black/80;
 }
 
 .dialog-content {
-  @apply fixed top-[50%] left-[50%] z-40 translate-x-[-50%] translate-y-[-50%] rounded-lg border border-neutral-900 bg-neutral-1000 shadow-2xl;
+  @apply fixed top-[50%] left-[50%] z-20 translate-x-[-50%] translate-y-[-50%] rounded-lg border border-neutral-900 bg-neutral-1000 shadow-2xl;
 }
 
 .dialog-title {
@@ -444,10 +450,6 @@ textarea {
 .hidden-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-.toast {
-  @apply flex select-none items-center rounded-md border border-neutral-900 bg-neutral-1000 px-3 py-1 text-center text-sm text-white backdrop-blur !important;
 }
 
 .loading-dots {
@@ -526,12 +528,12 @@ textarea {
 }
 
 .animate-menu-up[data-state='open'] {
-  animation-duration: 150ms;
+  animation-duration: 300ms;
   animation-name: menu-slide-up;
 }
 
 .animate-menu-up[data-state='closed'] {
-  animation-duration: 300ms;
+  animation-duration: 400ms;
   animation-name: menu-slide-up-reverse;
 }
 
@@ -546,7 +548,7 @@ textarea {
 }
 
 .animate-overlay-appear[data-state='closed'] {
-  animation-duration: 300ms;
+  animation-duration: 400ms;
   animation-name: opacity-reverse;
 }
 
@@ -703,304 +705,5 @@ textarea {
 @media (prefers-reduced-motion) {
   .loading-skeleton {
     --pseudo-element-display: none;
-  }
-}
-
-@keyframes slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slide-up-reverse {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-}
-
-@keyframes dialog-slide-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -47%) scale(0.99);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-@keyframes dialog-slide-in-reverse {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-50%, -47%) scale(0.99);
-  }
-}
-
-@keyframes menu-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes menu-slide-up-reverse {
-  from {
-    opacity: 1;
-    transform: translateY(0px);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-}
-
-@keyframes menu-slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes menu-slide-down-reverse {
-  from {
-    opacity: 1;
-    transform: translateY(0px);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-}
-
-@keyframes slide-up-scale {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  50% {
-    transform: translateY(-5px) scale(1.02);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes slide-up-scale-reverse {
-  0% {
-    opacity: 1;
-    transform: translateY(0px) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(10px) scale(0.98);
-  }
-}
-
-@keyframes toast-enter {
-  0% {
-    opacity: 0;
-    transform: translateY(20%);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes toast-exit {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(20%);
-  }
-}
-
-@keyframes opacity {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes opacity-reverse {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes caret {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes blink {
-  0% {
-    opacity: 0.2;
-  }
-  20% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.2;
-  }
-}
-
-@keyframes slideUpAndFade {
-  from {
-    opacity: 0;
-    transform: translateY(2px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideRightAndFade {
-  from {
-    opacity: 0;
-    transform: translateX(-2px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideDownAndFade {
-  from {
-    opacity: 0;
-    transform: translateY(-2px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideLeftAndFade {
-  from {
-    opacity: 0;
-    transform: translateX(2px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes progress {
-  0% {
-    width: 0;
-    transform: translateX(0);
-  }
-  50% {
-    width: 100%;
-    transform: translateX(0);
-  }
-  100% {
-    width: 100%;
-    transform: translateX(100%);
-  }
-}
-
-@keyframes expand-height {
-  0% {
-    height: 0;
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  100% {
-    height: min-content;
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes scale-bounce {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes bounce-subtle {
-  0%,
-  100% {
-    transform: translateY(-2%);
-    animation-timing-function: ease-in-out;
-  }
-  50% {
-    transform: translateY(0);
-    animation-timing-function: ease-in-out;
-  }
-}
-
-@keyframes loading-skeleton {
-  100% {
-    transform: translateX(100%);
   }
 }

@@ -9,20 +9,20 @@ type SystemStatusButtonProps = {
 
 export const SystemStatusButton: FC<SystemStatusButtonProps> = ({ status }) => {
   return (
-    <div className="flex w-min flex-row items-center gap-2 rounded-md border border-neutral-900 px-2 py-1 transition hover:bg-neutral-900">
+    <a
+      className="button-ring group flex w-min flex-row items-center gap-2 rounded-md border border-neutral-900 px-2 py-1 outline-none transition hover:bg-neutral-950"
+      href="https://status.markprompt.com"
+      target="_blank"
+      rel="noreferrer"
+    >
       <div
-        className={cn('h-1.5 w-1.5 rounded-full', {
+        className={cn('h-1.5 w-1.5 rounded-full group-hover:animate-pulse', {
           'bg-green-500': status === 'operational',
           'bg-orange-500': status === 'degraded',
           'bg-rose-500': status === 'downtime',
         })}
       />
-      <a
-        className="whitespace-nowrap text-xs font-normal text-neutral-500 "
-        href="https://status.markprompt.com"
-        target="_blank"
-        rel="noreferrer"
-      >
+      <div className="whitespace-nowrap text-xs font-normal text-neutral-500">
         {(() => {
           switch (status) {
             case 'degraded':
@@ -33,7 +33,7 @@ export const SystemStatusButton: FC<SystemStatusButtonProps> = ({ status }) => {
               return 'All systems normal';
           }
         })()}
-      </a>
-    </div>
+      </div>
+    </a>
   );
 };

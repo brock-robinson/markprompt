@@ -10,14 +10,12 @@ import {
   OpenAIEmbeddingsModelId,
 } from '@markprompt/core';
 import slugify from '@sindresorhus/slugify';
-import confetti from 'canvas-confetti';
 import dayjs from 'dayjs';
 import { ChevronsUp, GitBranchIcon, Globe, Upload } from 'lucide-react';
 import { minimatch } from 'minimatch';
 import { customAlphabet } from 'nanoid';
 import pako from 'pako';
 import { JSXElementConstructor } from 'react';
-import tailwindColors from 'tailwindcss/colors';
 import type { Config } from 'unique-names-generator';
 import {
   adjectives,
@@ -49,7 +47,8 @@ import {
 } from '@/types/types';
 
 import { MIN_SLUG_LENGTH } from './constants';
-import { removeSchema } from './utils.edge';
+import { getIntegrationId, getIntegrationName } from './integrations/nango';
+import { removeSchema } from './utils.nodeps';
 
 const lookup = [
   { value: 1, symbol: '' },
@@ -320,37 +319,6 @@ export const getResponseOrThrow = async <T>(res: Response): Promise<T> => {
   return res.json();
 };
 
-export const showConfetti = () => {
-  const end = Date.now() + 2 * 1000;
-  const confettiColors = [
-    tailwindColors.sky['700'],
-    tailwindColors.fuchsia['700'],
-  ];
-
-  (function frame() {
-    confetti({
-      particleCount: 3,
-      angle: 60,
-      spread: 80,
-      startVelocity: 50,
-      origin: { x: 0 },
-      colors: confettiColors,
-    });
-    confetti({
-      particleCount: 3,
-      angle: 120,
-      spread: 80,
-      startVelocity: 50,
-      origin: { x: 1 },
-      colors: confettiColors,
-    });
-
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    }
-  })();
-};
-
 const formatNumberK = (n: number) => {
   if (n < 1e3) {
     return `${n}`;
@@ -473,6 +441,10 @@ export const isSKTestKey = (key: string | null) => {
   return key?.startsWith(SK_TEST_PREFIX);
 };
 
+export const generateConnectionId = () => {
+  return generateKey();
+};
+
 export const stringToLLMInfo = (
   model?:
     | OpenAIChatCompletionsModelId
@@ -575,7 +547,7 @@ export const shouldIncludeFileWithPath = (
     // Both are equivalent as URLs, so a given glob pattern should be
     // checked against both.
     if (path.endsWith('/')) {
-      pathVariants.push(path.replace(/\/+$/, ''));
+      pathVariants.push(removeTrailingSlash(path));
     } else {
       pathVariants.push(path + '/');
     }
@@ -657,7 +629,8 @@ export const getLabelForSource = (source: Source, inline: boolean) => {
     case 'api-upload':
       return 'API uploads';
     case 'nango': {
-      return (source.data as NangoSourceDataType).identifier;
+      const data = source.data as NangoSourceDataType;
+      return data.name || getIntegrationName(data.integrationId);
     }
     default:
       return 'Unknown source';
@@ -699,6 +672,16 @@ export const getFullURLForPath = (source: Source, path: string) => {
     }
     case 'website': {
       return toNormalizedUrl(path);
+    }
+    case 'nango': {
+      const data = source.data as NangoSourceDataType;
+      switch (data.integrationId) {
+        case 'notion-pages':
+          return toNormalizedUrl(path);
+        case 'website-pages':
+          return toNormalizedUrl(path);
+      }
+      return undefined;
     }
     default:
       return undefined;
@@ -753,21 +736,46 @@ export const toNormalizedUrl = (url: string, useInsecureSchema?: boolean) => {
 
   try {
     const parsedUrl = new URL(url);
-    return `${parsedUrl.protocol}//${parsedUrl.hostname}${parsedUrl.pathname}`.replace(
-      /\/+$/,
-      '',
+    return removeTrailingSlash(
+      `${parsedUrl.protocol}//${parsedUrl.hostname}${parsedUrl.pathname}`,
     );
-  } catch {
+  } catch (e) {
     // Do nothing, just return the URL as is.
     return url;
   }
+};
+
+export const removeTrailingSlashAndHash = (url: string) => {
+  const urlObj = new URL(url);
+  urlObj.hash = '';
+  return urlObj.toString().replace(/\/+$/, '');
+};
+
+export const addSchemaRemoveTrailingSlashAndHash = (
+  url: string,
+  useInsecureSchema?: boolean,
+) => {
+  // Add schema, remove trailing slashes and hash. This normalizes URLs
+  // but retains query parameters, for instance when importing GitHub
+  // discussions that are "answered" (the "answered" part if indicated in
+  // the query string parameters).
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    // If not, add "https://" or "http://" to the beginning of the URL
+    url = (useInsecureSchema ? 'http://' : 'https://') + url;
+  }
+
+  return removeTrailingSlashAndHash(url);
 };
 
 export const removeTrailingSlashQueryParamsAndHash = (url: string) => {
   const urlObj = new URL(url);
   urlObj.search = '';
   urlObj.hash = '';
-  return urlObj.toString().replace(/\/+$/, '');
+  return removeTrailingSlash(urlObj.toString());
+};
+
+export const removeTrailingSlash = (url: string) => {
+  return url.replace(/\/+$/, '');
 };
 
 export const getUrlHostname = (url: string) => {
@@ -872,8 +880,7 @@ export const getIconForSource = (source: Pick<DbSource, 'type' | 'data'>) => {
     case 'motif':
       return MotifIcon;
     case 'nango': {
-      const integrationId = (source.data as unknown as NangoSourceDataType)
-        ?.integrationId;
+      const integrationId = getIntegrationId(source);
       if (integrationId?.startsWith('salesforce-')) {
         return SalesforceIcon;
       }

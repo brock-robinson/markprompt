@@ -11,7 +11,8 @@ import {
   TableOfContents,
   useTableOfContents,
 } from './MarkdocLayout';
-import { Collapse, CollapseGroup } from '../ui/Collapse';
+import { Collapse } from '../ui/Collapse';
+import { CollapseGroup } from '../ui/CollapseGroup';
 import { ContentImage } from '../ui/ContentImage';
 import { DocsPrompt } from '../ui/DocsPrompt';
 import { Heading } from '../ui/Heading';

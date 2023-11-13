@@ -22,7 +22,7 @@ export const SelectItem = forwardRef(
         ref={forwardedRef}
       >
         <Select.ItemText>{children}</Select.ItemText>
-        <Select.ItemIndicator className="absolute left-1 inline-flex justify-center">
+        <Select.ItemIndicator className="absolute left-1.5 inline-flex justify-center">
           <Check className="h-3 w-3" />
         </Select.ItemIndicator>
       </Select.Item>

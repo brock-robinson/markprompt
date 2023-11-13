@@ -10,7 +10,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import colors from 'tailwindcss/colors';
 import { isPresent } from 'ts-is-present';
 
@@ -21,7 +21,6 @@ import {
   MotifSourceDataType,
   DbSource,
   WebsiteSourceDataType,
-  NangoSourceDataType,
 } from '@/types/types';
 
 import { processFile } from '../api';
@@ -37,9 +36,6 @@ import {
   getMotifFileContent,
   getMotifPublicFileMetadata,
 } from '../integrations/motif';
-import { getConnectionId } from '../integrations/nango';
-import { getRecords, triggerSync } from '../integrations/nango.client';
-import { getSyncId } from '../integrations/salesforce';
 import {
   extractLinksFromHtml,
   fetchPageContent,
@@ -223,38 +219,38 @@ const TrainingContextProvider = (props: PropsWithChildren) => {
         ) {
           // If this is a quota exceeded error, throw anew in order to
           // stop the batch processing
-          toast(
-            (t) => (
-              <div className="flex w-full flex-row items-center gap-4">
-                <p className="p-2">
-                  You have reached the quota of indexed content on this plan.
-                </p>
-                <button
-                  className="whitespace-nowrap font-medium"
-                  onClick={() => {
-                    emitter.emit(EVENT_OPEN_PLAN_PICKER_DIALOG);
-                    toast.dismiss(t.id);
-                  }}
-                  style={{
-                    // The .toast class needs to use the "!important"
-                    // flag, so we can only overwrite the text color
-                    // using a style prop.
-                    color: colors.sky['500'],
-                  }}
-                >
-                  Upgrade plan
-                </button>
-              </div>
-            ),
-            {
-              id: 'training-limit-reached',
-              duration: Infinity,
-              style: {
-                maxWidth: '400px',
-                width: '100%',
-              },
-            },
-          );
+          // toast(
+          //   (t) => (
+          //     <div className="flex w-full flex-row items-center gap-4">
+          //       <p className="p-2">
+          //         You have reached the quota of indexed content on this plan.
+          //       </p>
+          //       <button
+          //         className="whitespace-nowrap font-medium"
+          //         onClick={() => {
+          //           emitter.emit(EVENT_OPEN_PLAN_PICKER_DIALOG);
+          //           toast.dismiss(t.id);
+          //         }}
+          //         style={{
+          //           // The .toast class needs to use the "!important"
+          //           // flag, so we can only overwrite the text color
+          //           // using a style prop.
+          //           color: colors.sky['500'],
+          //         }}
+          //       >
+          //         Upgrade plan
+          //       </button>
+          //     </div>
+          //   ),
+          //   {
+          //     id: 'training-limit-reached',
+          //     duration: Infinity,
+          //     style: {
+          //       maxWidth: '400px',
+          //       width: '100%',
+          //     },
+          //   },
+          // );
           onFileProcessed?.(path);
           setState({ state: 'idle' });
           throw e;
@@ -390,68 +386,28 @@ const TrainingContextProvider = (props: PropsWithChildren) => {
           }
           break;
         }
-        case 'nango': {
-          if (!project?.id) {
-            break;
-          }
-          const data = source.data as NangoSourceDataType;
-          const syncId = getSyncId(data.integrationId);
-          const connectionId = getConnectionId(source.id);
+        // case 'nango': {
+        //   if (!project?.id) {
+        //     break;
+        //   }
 
-          await triggerSync(
-            project?.id,
-            data.integrationId,
-            connectionId,
-            syncId ? [syncId] : [],
-          );
+        //   const integrationId = getIntegrationId(source);
+        //   if (!integrationId) {
+        //     break;
+        //   }
 
-          const limit = 20;
+        //   const syncId = getSyncId(integrationId);
+        //   const connectionId = getConnectionId(source.id);
 
-          const processChunk = async (index: number): Promise<boolean> => {
-            const fileData = await getRecords(
-              project.id,
-              data.integrationId,
-              connectionId,
-              'NangoFile',
-              undefined,
-              index * limit,
-              limit,
-              'id',
-              'asc',
-              undefined,
-            );
+        //   await triggerSync(
+        //     project?.id,
+        //     integrationId,
+        //     connectionId,
+        //     syncId ? [syncId] : [],
+        //   );
 
-            if (fileData.length === 0) {
-              return true;
-            }
-
-            console.info(
-              `Done fetching data. Now processing ${fileData.length} files...`,
-            );
-
-            await generateEmbeddings(
-              source.id,
-              'nango',
-              fileData.length,
-              forceRetrain,
-              (i) => fileData[i].path,
-              async (i) => fileData[i],
-              onFileProcessed,
-            );
-
-            return false;
-          };
-
-          let index = 0;
-          let done = await processChunk(index);
-
-          while (!done) {
-            done = await processChunk(index);
-            index += 1;
-          }
-
-          break;
-        }
+        //   break;
+        // }
         case 'motif': {
           const data = source.data as MotifSourceDataType;
 

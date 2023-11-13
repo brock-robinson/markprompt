@@ -32,24 +32,28 @@ export interface Database {
           {
             foreignKeyName: "conversations_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "conversations_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "conversations_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "conversations_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -78,24 +82,28 @@ export interface Database {
           {
             foreignKeyName: "domains_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "domains_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "domains_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "domains_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -136,36 +144,42 @@ export interface Database {
           {
             foreignKeyName: "file_sections_cf_project_id_fkey"
             columns: ["cf_project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "file_sections_cf_project_id_fkey"
             columns: ["cf_project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "file_sections_cf_project_id_fkey"
             columns: ["cf_project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "file_sections_cf_project_id_fkey"
             columns: ["cf_project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "file_sections_file_id_fkey"
             columns: ["file_id"]
+            isOneToOne: false
             referencedRelation: "files"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "file_sections_file_id_fkey"
             columns: ["file_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["file_id"]
           }
@@ -212,30 +226,35 @@ export interface Database {
           {
             foreignKeyName: "files_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "files_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "files_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "files_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "files_source_id_fkey"
             columns: ["source_id"]
+            isOneToOne: false
             referencedRelation: "sources"
             referencedColumns: ["id"]
           }
@@ -267,30 +286,35 @@ export interface Database {
           {
             foreignKeyName: "memberships_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "memberships_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["team_id"]
           },
           {
             foreignKeyName: "memberships_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["team_id"]
           },
           {
             foreignKeyName: "memberships_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "memberships_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "v_users_with_pending_weekly_update_email"
             referencedColumns: ["id"]
           }
@@ -343,30 +367,35 @@ export interface Database {
           {
             foreignKeyName: "projects_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "projects_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "v_users_with_pending_weekly_update_email"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "projects_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "projects_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["team_id"]
           },
           {
             foreignKeyName: "projects_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["team_id"]
           }
@@ -398,24 +427,28 @@ export interface Database {
           {
             foreignKeyName: "prompt_configs_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "prompt_configs_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "prompt_configs_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "prompt_configs_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -492,36 +525,42 @@ export interface Database {
           {
             foreignKeyName: "query_stats_conversation_id_fkey"
             columns: ["conversation_id"]
+            isOneToOne: false
             referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_conversation_id_fkey"
             columns: ["conversation_id"]
+            isOneToOne: false
             referencedRelation: "decrypted_conversations"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -556,36 +595,42 @@ export interface Database {
           {
             foreignKeyName: "query_stats_usage_query_stat_id_fkey"
             columns: ["query_stat_id"]
-            referencedRelation: "query_stats"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "query_stats_usage_query_stat_id_fkey"
-            columns: ["query_stat_id"]
+            isOneToOne: false
             referencedRelation: "decrypted_query_stats"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_usage_query_stat_id_fkey"
             columns: ["query_stat_id"]
+            isOneToOne: false
+            referencedRelation: "query_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "query_stats_usage_query_stat_id_fkey"
+            columns: ["query_stat_id"]
+            isOneToOne: false
             referencedRelation: "v_insights_query_stats"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_usage_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_usage_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["team_id"]
           },
           {
             foreignKeyName: "query_stats_usage_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["team_id"]
           }
@@ -617,24 +662,28 @@ export interface Database {
           {
             foreignKeyName: "sources_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "sources_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "sources_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "sources_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -669,6 +718,7 @@ export interface Database {
           {
             foreignKeyName: "sync_queues_source_id_fkey"
             columns: ["source_id"]
+            isOneToOne: false
             referencedRelation: "sources"
             referencedColumns: ["id"]
           }
@@ -715,12 +765,14 @@ export interface Database {
           {
             foreignKeyName: "teams_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "teams_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "v_users_with_pending_weekly_update_email"
             referencedColumns: ["id"]
           }
@@ -752,36 +804,42 @@ export interface Database {
           {
             foreignKeyName: "tokens_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "tokens_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "v_users_with_pending_weekly_update_email"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "tokens_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "tokens_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "tokens_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "tokens_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -828,12 +886,14 @@ export interface Database {
           {
             foreignKeyName: "user_access_tokens_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "user_access_tokens_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "v_users_with_pending_weekly_update_email"
             referencedColumns: ["id"]
           }
@@ -880,6 +940,7 @@ export interface Database {
           {
             foreignKeyName: "users_id_fkey"
             columns: ["id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -913,24 +974,28 @@ export interface Database {
           {
             foreignKeyName: "conversations_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "conversations_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "conversations_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "conversations_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -1013,36 +1078,42 @@ export interface Database {
           {
             foreignKeyName: "query_stats_conversation_id_fkey"
             columns: ["conversation_id"]
+            isOneToOne: false
             referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_conversation_id_fkey"
             columns: ["conversation_id"]
+            isOneToOne: false
             referencedRelation: "decrypted_conversations"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -1057,24 +1128,28 @@ export interface Database {
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -1108,24 +1183,28 @@ export interface Database {
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -1141,24 +1220,28 @@ export interface Database {
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -1174,24 +1257,28 @@ export interface Database {
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -1207,24 +1294,28 @@ export interface Database {
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -1240,24 +1331,28 @@ export interface Database {
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -1281,36 +1376,42 @@ export interface Database {
           {
             foreignKeyName: "query_stats_conversation_id_fkey"
             columns: ["conversation_id"]
+            isOneToOne: false
             referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_conversation_id_fkey"
             columns: ["conversation_id"]
+            isOneToOne: false
             referencedRelation: "decrypted_conversations"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_file_section_search_infos"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_info"
             referencedColumns: ["project_id"]
           },
           {
             foreignKeyName: "query_stats_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "v_team_project_usage_info"
             referencedColumns: ["project_id"]
           }
@@ -1347,6 +1448,7 @@ export interface Database {
           {
             foreignKeyName: "users_id_fkey"
             columns: ["id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           }

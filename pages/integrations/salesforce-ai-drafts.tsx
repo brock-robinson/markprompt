@@ -1,26 +1,12 @@
-import cn from 'classnames';
 import { ChevronLeft, Download } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FC, JSXElementConstructor, ReactNode } from 'react';
 import Balancer from 'react-wrap-balancer';
 
-import { AlgoliaIcon } from '@/components/icons/brands/Algolia';
-import { FrontIcon } from '@/components/icons/brands/Front';
-import { HubSpotIcon } from '@/components/icons/brands/HubSpotIcon';
-import { JiraIcon } from '@/components/icons/brands/Jira';
-import { NotionIcon } from '@/components/icons/brands/Notion';
-import { SalesforceIcon } from '@/components/icons/brands/Salesforce';
-import { SlackIcon } from '@/components/icons/brands/Slack';
-import { ZendeskIcon } from '@/components/icons/brands/Zendesk';
-import { DiscordIcon } from '@/components/icons/Discord';
-import { GitHubIcon } from '@/components/icons/GitHub';
 import LandingNavbar from '@/components/layouts/LandingNavbar';
 import { SharedHead } from '@/components/pages/SharedHead';
 import Button from '@/components/ui/Button';
 import { Pattern } from '@/components/ui/Pattern';
-import { Tag } from '@/components/ui/Tag';
-import { ContactWindow } from '@/components/user/ChatWindow';
 
 const Page = () => {
   return (

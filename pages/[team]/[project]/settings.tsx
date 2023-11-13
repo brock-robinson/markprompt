@@ -12,12 +12,12 @@ import { Clipboard, X, Trash2, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import Router, { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import ConfirmDialog from '@/components/dialogs/Confirm';
 import { ProjectSettingsLayout } from '@/components/layouts/ProjectSettingsLayout';
 import Button from '@/components/ui/Button';
-import { ErrorLabel } from '@/components/ui/Forms';
+import { ErrorLabel, FormLabel, FormRoot } from '@/components/ui/Forms';
 import { NoAutoInput } from '@/components/ui/Input';
 import {
   CTABar,
@@ -49,7 +49,7 @@ import {
   isValidDomain,
   truncateMiddle,
 } from '@/lib/utils';
-import { getDomain, removeSchema } from '@/lib/utils.edge';
+import { getDomain } from '@/lib/utils.nodeps';
 import { Domain, Project, Token } from '@/types/types';
 
 const ProjectSettingsPage = () => {
@@ -144,11 +144,9 @@ const ProjectSettingsPage = () => {
             }}
           >
             {({ isSubmitting, isValid }) => (
-              <Form>
-                <div className="flex flex-col gap-1 p-4">
-                  <p className="mb-1 text-xs font-medium text-neutral-300">
-                    Name
-                  </p>
+              <FormRoot>
+                <div className="FormField px-4 pt-4">
+                  <FormLabel>Name</FormLabel>
                   <Field
                     type="text"
                     name="name"
@@ -157,9 +155,9 @@ const ProjectSettingsPage = () => {
                     disabled={isSubmitting}
                   />
                   <ErrorMessage name="name" component={ErrorLabel} />
-                  <p className="mb-1 mt-4 text-xs font-medium text-neutral-300">
-                    Slug
-                  </p>
+                </div>
+                <div className="FormField px-4 pb-4">
+                  <FormLabel>Slug</FormLabel>
                   <Field
                     type="text"
                     name="slug"
@@ -180,7 +178,7 @@ const ProjectSettingsPage = () => {
                     Save
                   </Button>
                 </CTABar>
-              </Form>
+              </FormRoot>
             )}
           </Formik>
         </SettingsCard>
@@ -499,10 +497,8 @@ const ProjectSettingsPage = () => {
             >
               {({ isSubmitting }) => (
                 <Form>
-                  <div className="flex flex-col gap-1 p-4">
-                    <p className="mb-1 text-xs font-medium text-neutral-300">
-                      OpenAI API key
-                    </p>
+                  <div className="FormField p-4">
+                    <FormLabel>OpenAI API key</FormLabel>
                     <Field
                       type="text"
                       name="openai_key"
@@ -583,6 +579,7 @@ const ProjectSettingsPage = () => {
                     type="text"
                     name="markprompt_config"
                     className="h-[220px] font-mono"
+                    textAreaSize="sm"
                     as={NoAutoTextArea}
                     disabled={isSubmitting}
                   />

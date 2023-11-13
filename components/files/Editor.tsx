@@ -1,11 +1,13 @@
+import { FileReferenceFileData } from '@markprompt/core';
 import { parseISO } from 'date-fns';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import matter from 'gray-matter';
 import Link from 'next/link';
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
+import { getFileIdBySourceAndPath } from '@/lib/api';
 import { formatShortDateTimeInTimeZone } from '@/lib/date';
 import useProject from '@/lib/hooks/use-project';
 import useSources from '@/lib/hooks/use-sources';
@@ -28,19 +30,41 @@ import { SkeletonTable } from '../ui/Skeletons';
 
 dayjs.extend(localizedFormat);
 
+// The editor can take either a file id, or reference data (e.g. from
+// the conversation query stats).
 type EditorProps = {
-  filePath?: string;
+  fileId?: DbFile['id'];
+  fileReferenceData?: FileReferenceFileData;
   highlightSectionSlug?: string;
 };
 
-export const Editor: FC<EditorProps> = ({ filePath }) => {
+export const Editor: FC<EditorProps> = ({
+  fileId: _fileId,
+  fileReferenceData,
+}) => {
   const { project } = useProject();
   const { sources } = useSources();
+  const [fileId, setFileId] = useState(_fileId);
+
+  useEffect(() => {
+    if (!project?.id || _fileId || !fileReferenceData) {
+      return;
+    }
+
+    (async () => {
+      const fileId = await getFileIdBySourceAndPath(
+        project?.id,
+        fileReferenceData.source,
+        fileReferenceData.path,
+      );
+      if (fileId) {
+        setFileId(fileId);
+      }
+    })();
+  }, [project?.id, _fileId, fileReferenceData]);
 
   const { data: file, error } = useSWR(
-    project?.id && filePath
-      ? `/api/project/${project.id}/files/${encodeURIComponent(filePath)}`
-      : null,
+    project?.id && fileId ? `/api/project/${project.id}/files/${fileId}` : null,
     fetcher<DbFile>,
   );
 
@@ -79,18 +103,29 @@ export const Editor: FC<EditorProps> = ({ filePath }) => {
     );
   }, [source]);
 
-  const { markdownContent } = useMemo(() => {
+  const markdownContent = useMemo(() => {
     if (!file?.raw_content || !source) {
-      return { markdownContent: '', filename: '' };
+      return '';
+      // return { markdownContent: '', filename: '' };
     }
 
-    const filename = getFileNameForSourceAtPath(source, file.path);
-    const fileType =
-      (file.internal_metadata as any)?.contentType ?? getFileType(filename);
+    // TODO: remove this in the future. This is for backwards
+    // compatibility for sources that have not yet been synced with
+    // the new system, which stores the converted Markdown as the
+    // raw_content.
+    const insertedAt = new Date(source.inserted_at);
+    const newSyncArchitectureReleaseDate = new Date('2023-11-12');
+    if (insertedAt.getTime() < newSyncArchitectureReleaseDate.getTime()) {
+      const filename = getFileNameForSourceAtPath(source, file.path);
+      const fileType =
+        (file.internal_metadata as any)?.contentType ?? getFileType(filename);
+      const m = matter(file.raw_content);
+      return convertToMarkdown(m.content.trim(), fileType, undefined);
+    }
+
     const m = matter(file.raw_content);
-    const markdownContent = convertToMarkdown(m.content.trim(), fileType);
-    return { markdownContent, filename };
-  }, [file?.raw_content, file?.internal_metadata, file?.path, source]);
+    return m.content.trim();
+  }, [file?.internal_metadata, file?.path, file?.raw_content, source]);
 
   if (loading) {
     return (
@@ -102,11 +137,21 @@ export const Editor: FC<EditorProps> = ({ filePath }) => {
     );
   }
 
+  console.log('file', JSON.stringify(file, null, 2));
+  console.log('source', JSON.stringify(source, null, 2));
+
   if (!file || !source) {
     return (
-      <div className="flex flex-col items-center gap-2 p-4 text-sm text-neutral-300">
-        The file is not accessible. Please retrain your data, and make sure to
-        enable &ldquo;force retrain&rdquo;.
+      <div className="p-4 text-sm text-neutral-300">
+        The file is not accessible. Please sync your data again, and if the
+        problem persists,{' '}
+        <a
+          className="subtle-underline"
+          href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`}
+        >
+          contact support
+        </a>
+        .
       </div>
     );
   }

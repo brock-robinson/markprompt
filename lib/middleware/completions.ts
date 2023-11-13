@@ -12,7 +12,7 @@ import {
 import { checkCompletionsRateLimits } from '../rate-limits';
 import { createServiceRoleSupabaseClient } from '../supabase';
 import { getAuthorizationToken, truncateMiddle } from '../utils';
-import { removeSchema } from '../utils.edge';
+import { removeSchema } from '../utils.nodeps';
 
 // Admin access to Supabase, bypassing RLS.
 const supabaseAdmin = createServiceRoleSupabaseClient();

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import { TeamSettingsLayout } from '@/components/layouts/TeamSettingsLayout';
 import PlanPicker from '@/components/team/PlanPicker';

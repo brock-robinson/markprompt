@@ -1,8 +1,7 @@
 import Nango from '@nangohq/frontend';
 
-import { FileData, NangoIntegrationId, Project } from '@/types/types';
+import { FileData, NangoIntegrationId, Project, SyncData } from '@/types/types';
 
-import { NangoModel } from './salesforce';
 import { getResponseOrThrow } from '../utils';
 
 export const getNangoClientInstance = () => {
@@ -15,7 +14,7 @@ export const setMetadata = async (
   projectId: Project['id'],
   integrationId: NangoIntegrationId,
   connectionId: string,
-  metadata: any,
+  metadata: Record<string, any> | undefined,
 ) => {
   const res = await fetch(
     `/api/project/${projectId}/integrations/nango/set-metadata`,
@@ -50,17 +49,15 @@ export const deleteConnection = async (
   return getResponseOrThrow<void>(res);
 };
 
-export const triggerSync = async (
+export const triggerSyncs = async (
   projectId: Project['id'],
-  integrationId: NangoIntegrationId,
-  connectionId: string,
-  syncIds?: string[],
+  data: SyncData[],
 ) => {
   const res = await fetch(
-    `/api/project/${projectId}/integrations/nango/trigger-sync`,
+    `/api/project/${projectId}/integrations/nango/trigger-syncs`,
     {
       method: 'POST',
-      body: JSON.stringify({ integrationId, connectionId, syncIds }),
+      body: JSON.stringify({ data }),
       headers: {
         'Content-Type': 'application/json',
         accept: 'application/json',
@@ -74,7 +71,7 @@ export const getRecords = async (
   projectId: Project['id'],
   integrationId: NangoIntegrationId,
   connectionId: string,
-  model: NangoModel,
+  model: string,
   delta: string | undefined,
   offset: number | undefined,
   limit: number | undefined,

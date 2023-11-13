@@ -10,8 +10,6 @@ type Data = {
 
 const allowedMethods = ['POST'];
 
-const nango = getNangoServerInstance();
-
 export default withProjectAccess(
   allowedMethods,
   async (req: NextApiRequest, res: NextApiResponse<Data>) => {
@@ -21,6 +19,8 @@ export default withProjectAccess(
       } else if (!req.body.connectionId) {
         return res.status(400).json({ error: 'No connection id provided.' });
       }
+
+      const nango = getNangoServerInstance();
 
       await nango.deleteConnection(
         req.body.integrationId,

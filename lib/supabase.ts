@@ -1,23 +1,24 @@
 import type { SupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { PostgrestError, User, createClient } from '@supabase/supabase-js';
+import { formatISO } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 
 import { Database, Json } from '@/types/supabase';
 import {
   DbUser,
-  GitHubSourceDataType,
-  MotifSourceDataType,
   OAuthProvider,
   Project,
   DbSource,
-  SourceType,
   DbTeam,
-  WebsiteSourceDataType,
   PromptQueryStat,
   DbQueryFilter,
   QueryFilterComparisonOperation,
   QueryFilterLogicalOperation,
-  NangoSourceDataType,
+  DbFile,
+  FileSections,
+  DbSyncQueue,
+  LogLevel,
+  DbFileMetaChecksum,
 } from '@/types/types';
 
 import { DEFAULT_MARKPROMPT_CONFIG } from './constants';
@@ -161,13 +162,13 @@ export const getProjectIdFromSource = async (
   return data?.project_id || undefined;
 };
 
-export const getOrCreateSource = async (
+export const getOrCreateUploadOrAPISource = async (
   supabase: SupabaseClient<Database>,
   projectId: Project['id'],
-  type: SourceType,
-  data: any | undefined,
+  type: 'file-upload' | 'api-upload',
 ): Promise<DbSource['id']> => {
-  const source = await getSource(supabase, projectId, type, data);
+  // const source = await getFileOrAPISource(supabase, projectId, type, data);
+  const source = await getFileOrAPISource(supabase, projectId, type);
 
   if (source?.id) {
     return source.id;
@@ -183,11 +184,11 @@ export const getOrCreateSource = async (
   return newSourceData!.id;
 };
 
-export const getSource = async (
+export const getFileOrAPISource = async (
   supabase: SupabaseClient<Database>,
   projectId: Project['id'],
-  sourceType: SourceType,
-  data: any,
+  sourceType: 'file-upload' | 'api-upload',
+  // data: any,
 ): Promise<DbSource | undefined> => {
   const { data: sources, error } = await supabase
     .from('sources')
@@ -202,30 +203,30 @@ export const getSource = async (
     case 'file-upload':
     case 'api-upload':
       return sources[0];
-    case 'github':
-      return sources.find((s) => {
-        const _data = s.data as GitHubSourceDataType;
-        return _data.url === data.url && _data.branch === data.branch;
-      });
-    case 'nango':
-      return sources.find((s) => {
-        const _data = s.data as NangoSourceDataType;
-        return _data.identifier === data.identifier;
-      });
-    case 'motif': {
-      return sources.find((s) => {
-        const _data = s.data as MotifSourceDataType;
-        return (
-          _data.projectDomain && _data.projectDomain === data.projectDomain
-        );
-      });
-    }
-    case 'website': {
-      return sources.find((s) => {
-        const _data = s.data as WebsiteSourceDataType;
-        return _data.url && _data.url === data.url;
-      });
-    }
+    // case 'github':
+    //   return sources.find((s) => {
+    //     const _data = s.data as GitHubSourceDataType;
+    //     return _data.url === data.url && _data.branch === data.branch;
+    //   });
+    // case 'nango':
+    //   return sources.find((s) => {
+    //     const _data = s.data as NangoSourceDataType;
+    //     return _data.identifier === data.identifier;
+    //   });
+    // case 'motif': {
+    //   return sources.find((s) => {
+    //     const _data = s.data as MotifSourceDataType;
+    //     return (
+    //       _data.projectDomain && _data.projectDomain === data.projectDomain
+    //     );
+    //   });
+    // }
+    // case 'website': {
+    //   return sources.find((s) => {
+    //     const _data = s.data as WebsiteSourceDataType;
+    //     return _data.url && _data.url === data.url;
+    //   });
+    // }
   }
 };
 
@@ -462,6 +463,184 @@ export const getQueryStats = async (
   });
 
   return { queries, error: null };
+};
+
+export const createFile = async (
+  supabase: SupabaseClient<Database>,
+  // TODO: remove once migration is safely completed. We set an explicit
+  // value to prevent NULL values, because if a row has a NULL value,
+  // somehow it won't be returned in the inner joined filter query.
+  _projectId: Project['id'],
+  sourceId: DbSource['id'],
+  path: string,
+  meta: any,
+  internalMetadata: any,
+  checksum: string,
+  rawContent: string,
+  tokenCount?: number,
+): Promise<DbFile['id'] | undefined> => {
+  const { error, data } = await supabase
+    .from('files')
+    .insert([
+      {
+        source_id: sourceId,
+        project_id: _projectId,
+        path,
+        meta,
+        internal_metadata: internalMetadata,
+        checksum,
+        raw_content: rawContent,
+        ...(tokenCount ? { token_count: tokenCount } : {}),
+      },
+    ])
+    .select('id')
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data?.id as DbFile['id'];
+};
+
+export const batchStoreFileSections = async (
+  supabase: SupabaseClient<Database>,
+  sections: Omit<FileSections, 'id' | 'token_count'>[],
+) => {
+  const { error } = await supabase.from('file_sections').insert(sections);
+
+  if (error) {
+    // Too large? Attempt one embedding at a time.
+    for (const section of sections) {
+      await supabase.from('file_sections').insert([section]);
+    }
+  }
+};
+
+// Important: two files may have the same nangoId, in case where
+// the same source (e.g. Salesforce Knowledge) was added twice (say with
+// different filters). They are therefore distinguished by their sourceId.
+export const getFilesIdAndCheksumBySourceAndNangoId = async (
+  supabase: SupabaseClient<Database>,
+  sourceId: DbSource['id'],
+  nangoFileId: string,
+): Promise<DbFileMetaChecksum[]> => {
+  const { data, error } = await supabase
+    .from('files')
+    .select('id,meta,path,checksum')
+    .eq('source_id', sourceId)
+    .eq('internal_metadata->>nangoFileId', nangoFileId);
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data;
+};
+
+export const batchDeleteFiles = async (
+  supabase: SupabaseClient<Database>,
+  ids: DbFile['id'][],
+) => {
+  await supabase.from('files').delete().in('id', ids);
+};
+
+// Important: two files may have the same nangoId, in case where
+// the same source (e.g. Salesforce Knowledge) was added twice (say with
+// different filters). They are therefore distinguished by their sourceId.
+export const batchDeleteFilesBySourceAndNangoId = async (
+  supabase: SupabaseClient<Database>,
+  sourceId: DbSource['id'],
+  ids: string[],
+) => {
+  await supabase
+    .from('files')
+    .delete()
+    .eq('source_id', sourceId)
+    .in('internal_metadata->>nangoFileId', ids);
+};
+
+export const getOrCreateRunningSyncQueueForSource = async (
+  supabase: SupabaseClient<Database>,
+  sourceId: DbSource['id'],
+): Promise<DbSyncQueue['id']> => {
+  const { data } = await supabase
+    .from('sync_queues')
+    .select('id')
+    .eq('source_id', sourceId)
+    .eq('status', 'running')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .select()
+    .maybeSingle();
+
+  if (data?.id) {
+    return data?.id;
+  }
+  return createSyncQueue(supabase, sourceId);
+};
+
+export const createSyncQueue = async (
+  supabase: SupabaseClient<Database>,
+  sourceId: DbSource['id'],
+): Promise<DbSyncQueue['id']> => {
+  const { error, data } = await supabase
+    .from('sync_queues')
+    .insert([{ source_id: sourceId, status: 'running' }])
+    .select('id')
+    .limit(1)
+    .maybeSingle();
+  if (error || !data?.id) {
+    throw error;
+  }
+  return data.id;
+};
+
+export const updateSyncQueue = async (
+  supabase: SupabaseClient<Database>,
+  id: DbSyncQueue['id'],
+  status: DbSyncQueue['status'],
+  log:
+    | {
+        message: string;
+        level: LogLevel;
+      }
+    | undefined,
+) => {
+  await updateSyncQueueStatus(supabase, id, status);
+  if (log) {
+    await appendLogToSyncQueue(supabase, id, log.message, log.level);
+  }
+};
+
+export const updateSyncQueueStatus = async (
+  supabase: SupabaseClient<Database>,
+  id: DbSyncQueue['id'],
+  status: DbSyncQueue['status'],
+) => {
+  let payload: Partial<DbSyncQueue> = { status };
+  // If status if a completion status, also append the ended_at timestamp
+  if (status === 'canceled' || status === 'errored' || status === 'complete') {
+    payload = { ...payload, ended_at: formatISO(new Date()) };
+  }
+  await supabase.from('sync_queues').update(payload).eq('id', id);
+};
+
+const appendLogToSyncQueue = async (
+  supabase: SupabaseClient<Database>,
+  syncQueueId: DbSyncQueue['id'],
+  message: string,
+  level: LogLevel,
+) => {
+  await supabase.rpc('append_log_to_sync_queue', {
+    id: syncQueueId,
+    entry: {
+      timestamp: formatISO(new Date()),
+      message,
+      level,
+    },
+  });
 };
 
 export const getPublicAnonSupabase = () => {

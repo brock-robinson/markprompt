@@ -26,8 +26,9 @@ const BlogPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
   return (
     <>
       <SharedHead
-        title={`${frontmatter.title} | Markprompt Blog`}
+        title={frontmatter.title}
         description={frontmatter.description}
+        section="blog"
         ogImage={
           frontmatter['og:image'] ||
           frontmatter.cover ||

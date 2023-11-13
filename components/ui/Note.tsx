@@ -40,7 +40,7 @@ export const Note: FC<NoteProps> = ({ size, className, type, children }) => {
     >
       <Icon
         type={type}
-        className={cn('mt-1 flex-none', {
+        className={cn('mt-[2px] flex-none', {
           'h-5 w-5': noteSize === 'base',
           'h-4 w-4': noteSize === 'sm',
         })}

@@ -1,3 +1,4 @@
+import { FileReferenceFileData } from '@markprompt/core';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { FC } from 'react';
@@ -7,14 +8,16 @@ import { DbFile } from '@/types/types';
 import { Editor } from './Editor';
 
 type EditorDialogProps = {
-  filePath?: string;
+  fileId?: DbFile['id'];
+  fileReferenceData?: FileReferenceFileData;
   highlightSectionSlug?: string;
   open: boolean;
   setOpen: (open: boolean) => void;
 };
 
 const EditorDialog: FC<EditorDialogProps> = ({
-  filePath,
+  fileId,
+  fileReferenceData,
   highlightSectionSlug,
   open,
   setOpen,
@@ -35,7 +38,8 @@ const EditorDialog: FC<EditorDialogProps> = ({
           <div className="h-full overflow-y-auto">
             <div className="mx-auto flex w-full max-w-screen-md p-8">
               <Editor
-                filePath={filePath}
+                fileId={fileId}
+                fileReferenceData={fileReferenceData}
                 highlightSectionSlug={highlightSectionSlug}
               />
             </div>

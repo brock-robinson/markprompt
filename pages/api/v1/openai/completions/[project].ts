@@ -45,11 +45,12 @@ import {
   getCompletionsResponseText,
   stringToLLMInfo,
 } from '@/lib/utils';
-import { isRequestFromMarkprompt } from '@/lib/utils.edge';
 import {
   getCompletionsUrl,
   isFalsyQueryParam,
   isTruthyQueryParam,
+  isRequestFromMarkprompt,
+  safeParseInt,
 } from '@/lib/utils.nodeps';
 import {
   ApiError,

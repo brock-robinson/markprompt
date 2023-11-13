@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { withProjectAccess } from '@/lib/middleware/common';
 import { createServiceRoleSupabaseClient, getQueryStats } from '@/lib/supabase';
-import { safeParseInt, safeParseJSON } from '@/lib/utils.edge';
+import { safeParseInt, safeParseJSON } from '@/lib/utils.nodeps';
 import { DbQueryFilter, Project, PromptQueryStat } from '@/types/types';
 
 type Data =

@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { Clipboard } from 'lucide-react';
 import { FC, Fragment, useMemo } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import { copyToClipboard } from '@/lib/utils';
 

@@ -19,7 +19,7 @@ import React, {
 } from 'react';
 
 import Button from '../ui/Button';
-import { CodePanel } from '../ui/Code';
+import { CodePanel } from '../ui/CodePanel';
 
 type MarkdocCodeFenceProps = {
   children: ReactNode;

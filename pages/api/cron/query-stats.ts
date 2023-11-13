@@ -10,7 +10,7 @@ import {
   getProjectConfigData,
 } from '@/lib/supabase';
 import { getCompletionsResponseText } from '@/lib/utils';
-import { getCompletionsUrl } from '@/lib/utils.nodeps';
+import { getCompletionsUrl, safeParseInt } from '@/lib/utils.nodeps';
 import {
   OpenAIModelIdWithType,
   Project,

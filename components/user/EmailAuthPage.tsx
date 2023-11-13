@@ -9,7 +9,7 @@ import { MarkpromptIcon } from '@/components/icons/Markprompt';
 import Button from '@/components/ui/Button';
 import useUser from '@/lib/hooks/use-user';
 import { getPublicAnonSupabase } from '@/lib/supabase';
-import { getAppOrigin } from '@/lib/utils.edge';
+import { getAppOrigin } from '@/lib/utils.nodeps';
 
 import { ContactWindow } from './ChatWindow';
 

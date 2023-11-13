@@ -12,7 +12,7 @@ import { ApiError, DbTeam, Project } from '@/types/types';
 import { get, getProjectIdByKey, setWithExpiration } from '../redis';
 import { hasUserAccessToProject, hasUserAdminAccessToTeam } from '../supabase';
 import { isSKTestKey, truncateMiddle } from '../utils';
-import { isAppHost } from '../utils.edge';
+import { isAppHost } from '../utils.nodeps';
 
 export interface Session {
   user: {

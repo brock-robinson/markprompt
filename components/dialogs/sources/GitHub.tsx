@@ -12,9 +12,8 @@ import {
 import { groupBy } from 'lodash-es';
 import { Package2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { FC, ReactNode, useMemo, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import { GitHubIcon } from '@/components/icons/GitHub';
 import Button from '@/components/ui/Button';
@@ -25,7 +24,6 @@ import { addSource, deleteSource } from '@/lib/api';
 import useGitHub from '@/lib/hooks/integrations/use-github';
 import useProject from '@/lib/hooks/use-project';
 import useSources from '@/lib/hooks/use-sources';
-import useTeam from '@/lib/hooks/use-team';
 import useUsage from '@/lib/hooks/use-usage';
 import useUser from '@/lib/hooks/use-user';
 import useOAuth from '@/lib/hooks/utils/use-oauth';
@@ -33,6 +31,8 @@ import { isGitHubRepoAccessible } from '@/lib/integrations/github.node';
 import { setGitHubAuthState } from '@/lib/supabase';
 import { getLabelForSource } from '@/lib/utils';
 import { GitHubRepository, Project } from '@/types/types';
+
+import SourceDialog from './SourceDialog';
 
 const Loading = <p className="p-4 text-sm text-neutral-500">Loading...</p>;
 
@@ -320,52 +320,34 @@ const GitHubSource: FC<GitHubSourceProps> = ({
 };
 
 const GitHubAddSourceDialog = ({
+  open,
+  onOpenChange,
   openPricingAsDialog,
   onDidAddSource,
   children,
 }: {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   openPricingAsDialog?: boolean;
   onDidAddSource?: () => void;
-  children: ReactNode;
+  children?: ReactNode;
 }) => {
-  const { team } = useTeam();
-  const { project } = useProject();
-  const [githubDialogOpen, setGithubDialogOpen] = useState(false);
-
   return (
-    <Dialog.Root open={githubDialogOpen} onOpenChange={setGithubDialogOpen}>
-      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay className="animate-overlay-appear dialog-overlay" />
-        <Dialog.Content className="animate-dialog-slide-in dialog-content flex h-[90%] max-h-[720px] w-[90%] max-w-[500px] flex-col">
-          <Dialog.Title className="dialog-title flex-none">
-            Connect GitHub repo
-          </Dialog.Title>
-          <div className="dialog-description flex flex-none flex-col gap-2 border-b border-neutral-900 pb-4">
-            <p>
-              Sync files from a GitHub repo. You can specify which files to
-              include and exclude from the repository in the{' '}
-              <Link
-                className="subtle-underline"
-                href={`/${team?.slug}/${project?.slug}/settings`}
-              >
-                project configuration
-              </Link>
-              .
-            </p>
-          </div>
-          <div className="flex-grow">
-            <GitHubSource
-              openPricingAsDialog={openPricingAsDialog}
-              onDidAddSource={() => {
-                setGithubDialogOpen(false);
-                onDidAddSource?.();
-              }}
-            />
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <SourceDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      trigger={children && <Dialog.Trigger asChild>{children}</Dialog.Trigger>}
+      title="Connect GitHub repository"
+      description="Sync files from a GitHub repo."
+    >
+      <GitHubSource
+        openPricingAsDialog={openPricingAsDialog}
+        onDidAddSource={() => {
+          onOpenChange?.(false);
+          onDidAddSource?.();
+        }}
+      />
+    </SourceDialog>
   );
 };
 

@@ -22,7 +22,7 @@ import {
 } from '../date';
 import { canViewInsights } from '../stripe/tiers';
 import { fetcher, formatUrl } from '../utils';
-import { safeParseJSON } from '../utils.edge';
+import { safeParseJSON } from '../utils.nodeps';
 
 export type FilterSpec = {
   field: string;

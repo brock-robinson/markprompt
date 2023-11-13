@@ -11,7 +11,9 @@ export type ButtonVariant =
   | 'danger'
   | 'ghost'
   | 'text'
+  | 'textDanger'
   | 'plain'
+  | 'plainDanger'
   | 'bordered'
   | 'bordered-dashed'
   | 'fuchsia'
@@ -102,7 +104,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             ? className
             : cn(
                 className,
-                'button-ring relative flex select-none flex-row items-center whitespace-nowrap border disabled:cursor-not-allowed',
+                'button-ring relative flex select-none flex-row items-center whitespace-nowrap border active:outline-none disabled:cursor-not-allowed',
                 {
                   'rounded-md': !squareCorners && shape !== 'rounded',
                   'rounded-l-md border-r-0':
@@ -120,8 +122,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     variant === 'fuchsia',
                   'border-transparent bg-rose-800 text-white hover:bg-rose-900':
                     variant === 'danger',
-                  'border-neutral-800 bg-neutral-900 text-neutral-100 hover:bg-neutral-1000 disabled:border-transparent disabled:text-neutral-500 hover:disabled:bg-opacity-100':
+                  'border-neutral-800 bg-neutral-900 text-neutral-100 hover:bg-neutral-1000 disabled:border-transparent disabled:text-neutral-600 hover:disabled:bg-opacity-100':
                     variant === 'plain',
+                  'border-neutral-800 bg-neutral-900 text-rose-700 hover:bg-neutral-1000 disabled:border-transparent disabled:text-neutral-500 hover:disabled:bg-opacity-100':
+                    variant === 'plainDanger',
                   'border-neutral-800 text-neutral-100 hover:bg-neutral-1000 disabled:border-transparent disabled:text-neutral-500 hover:disabled:bg-opacity-100':
                     variant === 'bordered' || variant === 'bordered-dashed',
                   'border-dashed': variant === 'bordered-dashed',
@@ -131,6 +135,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     variant === 'ghost',
                   'border-transparent text-neutral-100 disabled:text-neutral-500':
                     variant === 'text',
+                  'border-transparent text-rose-700 hover:text-rose-600 active:outline-none active:ring-0 disabled:text-neutral-500':
+                    variant === 'textDanger',
                   'border-fuchsia-400/20 text-fuchsia-400 hover:bg-fuchsia-900/20 hover:text-fuchsia-100 disabled:border-transparent disabled:text-fuchsia-500 hover:disabled:bg-opacity-100':
                     variant === 'borderedFuchsia',
                   'text-sm': size === 'base' || size === 'sm',

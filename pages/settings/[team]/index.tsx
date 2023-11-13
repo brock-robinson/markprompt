@@ -11,13 +11,13 @@ import {
 } from 'formik';
 import Router, { useRouter } from 'next/router';
 import { useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import ConfirmDialog from '@/components/dialogs/Confirm';
 import { GitHubIcon } from '@/components/icons/GitHub';
 import { TeamSettingsLayout } from '@/components/layouts/TeamSettingsLayout';
 import Button from '@/components/ui/Button';
-import { ErrorLabel } from '@/components/ui/Forms';
+import { ErrorLabel, FormLabel, FormRoot } from '@/components/ui/Forms';
 import { NoAutoInput } from '@/components/ui/Input';
 import {
   CTABar,
@@ -106,11 +106,9 @@ const TeamSettingsPage = () => {
             }}
           >
             {({ isSubmitting, isValid }) => (
-              <Form>
-                <div className="flex flex-col gap-1 p-4">
-                  <p className="mb-1 text-xs font-medium text-neutral-300">
-                    Name
-                  </p>
+              <FormRoot>
+                <div className="FormField px-4 pt-4">
+                  <FormLabel>Name</FormLabel>
                   <Field
                     type="text"
                     name="name"
@@ -119,9 +117,9 @@ const TeamSettingsPage = () => {
                     disabled={isSubmitting}
                   />
                   <ErrorMessage name="name" component={ErrorLabel} />
-                  <p className="mb-1 mt-4 text-xs font-medium text-neutral-300">
-                    Slug
-                  </p>
+                </div>
+                <div className="FormField px-4 pb-4">
+                  <FormLabel>Slug</FormLabel>
                   <Field
                     type="text"
                     name="slug"
@@ -142,7 +140,7 @@ const TeamSettingsPage = () => {
                     Save
                   </Button>
                 </CTABar>
-              </Form>
+              </FormRoot>
             )}
           </Formik>
         </SettingsCard>

@@ -73,6 +73,10 @@ export const getMessageTokenCount = (
   }, tokensPerMessage);
 };
 
+export const getTextTokenCount = (text: string, tokenizer: Tiktoken) => {
+  return tokenizer.encode(text).length;
+};
+
 // Source: https://platform.openai.com/docs/models/overview
 export const getMaxTokenCount = (modelId: OpenAIChatCompletionsModelId) => {
   switch (modelId) {

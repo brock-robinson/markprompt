@@ -14,14 +14,13 @@ import { ChevronsUpDown, Check } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import { createTeam } from '@/lib/api';
 import useProject from '@/lib/hooks/use-project';
 import useProjects from '@/lib/hooks/use-projects';
 import useTeam from '@/lib/hooks/use-team';
 import useTeams from '@/lib/hooks/use-teams';
-import useUser from '@/lib/hooks/use-user';
 import { Tier, getTier, getTierName } from '@/lib/stripe/tiers';
 import { TagColor } from '@/types/types';
 
@@ -29,6 +28,7 @@ import Button from '../ui/Button';
 import { ErrorLabel } from '../ui/Forms';
 import { NoAutoInput } from '../ui/Input';
 import { CTABar } from '../ui/SettingsCard';
+import { SkeletonPanel } from '../ui/Skeletons';
 import { Slash } from '../ui/Slash';
 import { Tag } from '../ui/Tag';
 
@@ -63,7 +63,6 @@ const getColorForTier = (tier: Tier): TagColor => {
 };
 
 const TeamPicker: FC<TeamProjectPickerProps> = ({ onNewTeamClick }) => {
-  const { user } = useUser();
   const { teams, loading } = useTeams();
   const { team } = useTeam();
   const [isOpen, setOpen] = useState(false);
@@ -77,50 +76,46 @@ const TeamPicker: FC<TeamProjectPickerProps> = ({ onNewTeamClick }) => {
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setOpen}>
       <DropdownMenu.Trigger asChild>
-        {user?.has_completed_onboarding ? (
-          <button
-            className="no-ring flex select-none flex-row items-center gap-2 overflow-hidden truncate whitespace-nowrap rounded py-1 px-2 text-sm text-neutral-300 outline-none transition hover:bg-neutral-900 hover:text-neutral-400"
-            aria-label="Select team"
-          >
-            <span className="overflow-hidden truncate whitespace-nowrap">
-              {team?.name || ''}
-            </span>
-            {tier && (
-              <Tag color={getColorForTier(tier)}>{getTierName(tier)}</Tag>
-            )}
-            <ChevronsUpDown className="h-3 w-3 flex-none" />
-          </button>
-        ) : (
-          <p className="dropdown-menu-button select-none">{team?.name || ''}</p>
-        )}
+        <button
+          className="no-ring flex select-none flex-row items-center gap-2 overflow-hidden truncate whitespace-nowrap rounded py-1 px-2 text-sm text-neutral-300 outline-none transition hover:bg-neutral-900 hover:text-neutral-400"
+          aria-label="Select team"
+        >
+          <span className="overflow-hidden truncate whitespace-nowrap">
+            {team?.name || ''}
+          </span>
+          {tier && <Tag color={getColorForTier(tier)}>{getTierName(tier)}</Tag>}
+          <ChevronsUpDown className="h-3 w-3 flex-none" />
+        </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="animate-menu-up dropdown-menu-content"
+          className="animate-menu-up dropdown-menu-content h-full max-h-[calc(100vh-80px)]"
           sideOffset={5}
         >
-          {teams?.map((t) => {
-            const checked = t.slug === team?.slug;
-            return (
-              <DropdownMenu.CheckboxItem
-                key={`team-dropdown-${t.slug}`}
-                className="dropdown-menu-item dropdown-menu-item-indent"
-                checked={checked}
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
-                <>
-                  {checked && (
-                    <DropdownMenu.ItemIndicator className="dropdown-menu-item-indicator">
-                      <Check className="h-3 w-3" />
-                    </DropdownMenu.ItemIndicator>
-                  )}
-                  <Link href={`/${t.slug}`}>{t.name}</Link>
-                </>
-              </DropdownMenu.CheckboxItem>
-            );
-          })}
+          <div className="hidden-scrollbar flex-grow overflow-y-auto">
+            {teams?.map((t) => {
+              const checked = t.slug === team?.slug;
+              return (
+                <DropdownMenu.CheckboxItem
+                  key={`team-dropdown-${t.slug}`}
+                  className="dropdown-menu-item dropdown-menu-item-indent"
+                  checked={checked}
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                >
+                  <>
+                    {checked && (
+                      <DropdownMenu.ItemIndicator className="dropdown-menu-item-indicator">
+                        <Check className="h-3 w-3" />
+                      </DropdownMenu.ItemIndicator>
+                    )}
+                    <Link href={`/${t.slug}`}>{t.name}</Link>
+                  </>
+                </DropdownMenu.CheckboxItem>
+              );
+            })}
+          </div>
           <DropdownMenu.Separator className="dropdown-menu-separator" />
           {team && (
             <DropdownMenu.Item className="dropdown-menu-item dropdown-menu-item-indent">
@@ -151,13 +146,9 @@ const TeamPicker: FC<TeamProjectPickerProps> = ({ onNewTeamClick }) => {
 
 const ProjectPicker = () => {
   const { team } = useTeam();
-  const { projects, loading } = useProjects();
+  const { projects } = useProjects();
   const { project } = useProject();
   const [isOpen, setOpen] = useState(false);
-
-  if (loading || !team || !project) {
-    return <></>;
-  }
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setOpen}>
@@ -169,43 +160,49 @@ const ProjectPicker = () => {
           aria-label="Select team"
         >
           <span className="overflow-hidden truncate whitespace-nowrap">
-            {project.name}
+            {project?.name}
           </span>
           <ChevronsUpDown className="h-3 w-3 flex-none" />
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="animate-menu-up dropdown-menu-content"
+          className="animate-menu-up dropdown-menu-content h-full max-h-[calc(100vh-80px)]"
           sideOffset={5}
         >
-          {projects?.map((p) => {
-            const checked = p.slug === project?.slug;
-            return (
-              <DropdownMenu.CheckboxItem
-                key={`project-dropdown-${p.slug}`}
-                className="dropdown-menu-item dropdown-menu-item-indent"
-                checked={checked}
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
-                <>
-                  {checked && (
-                    <DropdownMenu.ItemIndicator className="dropdown-menu-item-indicator">
-                      <Check className="h-3 w-3" />
-                    </DropdownMenu.ItemIndicator>
-                  )}
-                  <Link href={`/${team.slug}/${p.slug}`}>{p.name}</Link>
-                </>
-              </DropdownMenu.CheckboxItem>
-            );
-          })}
+          <div className="hidden-scrollbar flex-grow overflow-y-auto">
+            {projects?.map((p) => {
+              const checked = p.slug === project?.slug;
+              return (
+                <DropdownMenu.CheckboxItem
+                  key={`project-dropdown-${p.slug}`}
+                  className="dropdown-menu-item dropdown-menu-item-indent"
+                  checked={checked}
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                >
+                  <>
+                    {checked && (
+                      <DropdownMenu.ItemIndicator className="dropdown-menu-item-indicator">
+                        <Check className="h-3 w-3" />
+                      </DropdownMenu.ItemIndicator>
+                    )}
+                    {team && (
+                      <Link href={`/${team.slug}/${p.slug}`}>{p.name}</Link>
+                    )}
+                  </>
+                </DropdownMenu.CheckboxItem>
+              );
+            })}
+          </div>
           <DropdownMenu.Separator className="dropdown-menu-separator" />
           <DropdownMenu.Item className="dropdown-menu-item dropdown-menu-item-indent">
-            <Link href={`/settings/${team.slug}/projects/new`}>
-              Create new project
-            </Link>
+            {team && (
+              <Link href={`/settings/${team.slug}/projects/new`}>
+                Create new project
+              </Link>
+            )}
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
@@ -216,17 +213,14 @@ const ProjectPicker = () => {
 export const TeamProjectPicker = () => {
   const router = useRouter();
   const session = useSession();
-  const { teams, mutate: mutateTeams, loading: loadingTeams } = useTeams();
+  const { teams, mutate: mutateTeams } = useTeams();
   const { team } = useTeam();
   const { project, loading: loadingProject } = useProject();
   const [isNewTeamDialogOpen, setNewTeamDialogOpen] = useState(false);
 
-  if (loadingTeams || !teams || !team) {
-    return <></>;
-  }
-
   const isNewProjectRoute =
-    router.asPath === `/settings/${team.slug}/projects/new`;
+    team && router.asPath === `/settings/${team.slug}/projects/new`;
+  const hasProjectPath = !!router.query?.project;
 
   return (
     <>
@@ -237,18 +231,24 @@ export const TeamProjectPicker = () => {
         {team ? (
           <TeamPicker onNewTeamClick={() => setNewTeamDialogOpen(true)} />
         ) : (
-          <></>
+          <SkeletonPanel onDark loading className="mr-2 ml-2 h-6 w-32" />
         )}
-        {!loadingProject && team && project && (
+        {hasProjectPath && (
           <>
             <Slash size="md" />
-            <ProjectPicker />
-          </>
-        )}
-        {isNewProjectRoute && (
-          <>
-            <Slash size="md" />
-            <p className="text-sm text-neutral-300">New project</p>
+            {!loadingProject && team && project ? (
+              <>
+                <ProjectPicker />
+              </>
+            ) : (
+              <SkeletonPanel onDark loading className="ml-2 h-6 w-24" />
+            )}
+            {isNewProjectRoute && (
+              <>
+                <Slash size="md" />
+                <p className="text-sm text-neutral-300">New project</p>
+              </>
+            )}
           </>
         )}
       </div>
@@ -329,5 +329,3 @@ export const TeamProjectPicker = () => {
     </>
   );
 };
-
-export default TeamProjectPicker;

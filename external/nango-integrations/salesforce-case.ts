@@ -27,19 +27,21 @@ export default async function fetchData(nango: NangoSync) {
 
   const filters = metadata?.filters;
 
-  let didSetWhere = false;
+  // let didSetWhere = false;
   if (filters?.length > 0) {
-    didSetWhere = true;
+    // didSetWhere = true;
     query += ` WHERE (${filters})`;
   }
 
-  if (nango.lastSyncDate) {
-    query += ` ${
-      didSetWhere ? 'AND' : 'WHERE'
-    } LastModifiedDate > ${nango.lastSyncDate.toISOString()}`;
-  }
+  // if (nango.lastSyncDate) {
+  //   query += ` ${
+  //     didSetWhere ? 'AND' : 'WHERE'
+  //   } LastModifiedDate > ${nango.lastSyncDate.toISOString()}`;
+  // }
 
   let endpoint = '/services/data/v53.0/query';
+
+  const records: NangoFile[] = [];
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
@@ -54,7 +56,9 @@ export default async function fetchData(nango: NangoSync) {
       metadata?.metadataFields,
     );
 
-    await nango.batchSave(mappedRecords, 'NangoFile');
+    for (const mappedRecord of mappedRecords) {
+      records.push(mappedRecord);
+    }
 
     if (response.data.done) {
       break;
@@ -62,6 +66,13 @@ export default async function fetchData(nango: NangoSync) {
 
     endpoint = response.data.nextRecordsUrl;
   }
+
+  // Important: we have enabled track_deletes, which means that everything
+  // that is not present in `batchSave` calls within a sync run will be deleted.
+  // Therefore, we need to call `batchSave` only once. Otherwise, if the
+  // script fails after a few calls to `batchSave`, everything else will be
+  // deleted. We'd rather the script fails and doesn't delete any data.
+  await nango.batchSave(records, 'NangoFile');
 }
 
 function mapRecords(
@@ -88,6 +99,7 @@ function mapRecords(
           return { ...acc, [key]: record[key] };
         }, {}),
       },
+      error: undefined,
     };
   });
 }

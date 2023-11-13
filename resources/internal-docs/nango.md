@@ -27,3 +27,7 @@ In order to deploy, run via npm:
 ```
 npm run nango-deploy-dev
 ```
+
+## Metadata
+
+Some sources, such as Notion, store metadata inside properties. Therefore, during the Nango sync, we save this as "metadata". But for other sources, where the content is regular HTML or Markdown, we don't do the metadata construction in the Nango sync script, since this requires heavy machines (YAML or DOM parsers) which we can't import currently in the Nango runtime. So this metadata extraction occurs in a second pass, in the Inngest functions, which run on our Vercel runtime.

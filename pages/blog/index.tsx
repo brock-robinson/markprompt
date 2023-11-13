@@ -8,19 +8,15 @@ import { AuthorList, CloudinaryImage } from '@/components/layouts/BlogLayout';
 import LandingNavbar from '@/components/layouts/LandingNavbar';
 import { SharedHead } from '@/components/pages/SharedHead';
 import { Pattern } from '@/components/ui/Pattern';
-import { getPageMetadataStaticProps } from '@/lib/pages';
+import { getBlogIndexStaticProps } from '@/lib/pages';
 
-const pageIds = JSON.parse(process.env.MOTIF_BLOG_PAGE_IDS!);
-
-export const getStaticProps: GetStaticProps = async () => {
-  return getPageMetadataStaticProps(pageIds as { [key: string]: string });
-};
+export const getStaticProps: GetStaticProps = () => getBlogIndexStaticProps(0);
 
 const BlogIndexPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
-  metadata,
+  posts,
 }) => {
-  const firstEntry = metadata[0];
-  const otherEntries = metadata.slice(1);
+  const firstEntry = posts[0];
+  const otherEntries = posts.slice(1);
 
   if (!firstEntry) {
     return <></>;
@@ -31,6 +27,8 @@ const BlogIndexPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
       <SharedHead
         title="Markprompt Blog"
         ogImage="https://markprompt.com/static/cover-blog.png"
+        section="blog"
+        exludePostfixFromTitle
       />
       <div className="relative mx-auto min-h-screen w-full">
         <Pattern />

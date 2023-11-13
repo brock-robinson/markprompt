@@ -7,8 +7,9 @@ import {
   useContext,
   useEffect,
 } from 'react';
+import { toast } from 'sonner';
 
-import { initUserData } from '../api';
+import { initUserData, updateUser } from '../api';
 import useProjects from '../hooks/use-projects';
 import useTeam from '../hooks/use-team';
 import useTeams from '../hooks/use-teams';
@@ -16,13 +17,11 @@ import useUser from '../hooks/use-user';
 import { useLocalStorage } from '../hooks/utils/use-localstorage';
 
 export type State = {
-  isOnboarding: boolean;
   didCompleteFirstQuery: boolean;
   setDidCompleteFirstQuery: (value: boolean) => void;
 };
 
 const initialContextState: State = {
-  isOnboarding: false,
   didCompleteFirstQuery: false,
   setDidCompleteFirstQuery: () => {
     // Do nothing
@@ -32,7 +31,8 @@ const initialContextState: State = {
 const AppContextProvider = (props: PropsWithChildren) => {
   const router = useRouter();
   const session = useSession();
-  const { user, loading: loadingUser } = useUser();
+
+  const { user, loading: loadingUser, mutate: mutateUser } = useUser();
   const { teams, loading: loadingTeams, mutate: mutateTeams } = useTeams();
   const { team } = useTeam();
   const { projects, mutate: mutateProjects } = useProjects();
@@ -49,24 +49,41 @@ const AppContextProvider = (props: PropsWithChildren) => {
       return;
     }
 
-    if (!user || loadingTeams) {
+    if (!user || !session?.user || loadingTeams) {
       return;
     }
 
-    (async () => {
+    const setupUser = async () => {
       const team = teams?.find((t) => t.is_personal);
       if (!team) {
-        await initUserData();
+        const { project, team: newTeam } = await initUserData();
         await mutateTeams();
         await mutateProjects();
+        await updateUser({ has_completed_onboarding: true });
+        await mutateUser();
+        if (newTeam && project) {
+          Router.push({
+            pathname: '/[team]/[project]',
+            query: { team: newTeam.slug, project: project.slug },
+          });
+        }
       }
-    })();
+    };
+
+    toast.promise(setupUser, {
+      loading: 'Setting up your account...',
+      success: () => {
+        return 'Account has been set up. Redirecting you to your starter project.';
+      },
+      error: 'Error setting up your account',
+    });
   }, [
     teams,
     team,
     loadingTeams,
     session?.user,
     user,
+    mutateUser,
     mutateTeams,
     mutateProjects,
   ]);
@@ -156,7 +173,6 @@ const AppContextProvider = (props: PropsWithChildren) => {
   return (
     <AppContext.Provider
       value={{
-        isOnboarding: !loadingUser && !user?.has_completed_onboarding,
         didCompleteFirstQuery: !!didCompleteFirstQuery,
         setDidCompleteFirstQuery,
       }}

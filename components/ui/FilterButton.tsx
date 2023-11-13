@@ -217,7 +217,7 @@ export const SingleSelectFilterButton: FC<SingleSelectFilterButtonProps> = ({
         >
           <h2 className="mb-2 text-sm font-bold text-neutral-300">{title}</h2>
           <RadioGroup.Root
-            className="RadioGroupRoot"
+            className="RadioGroupRoot RadioGroupRootColumnLayout"
             aria-label={title}
             defaultValue={`${initialSelectedIndex || 0}`}
             onValueChange={(value: any) => {

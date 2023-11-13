@@ -2,7 +2,7 @@ import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { withProjectAccess } from '@/lib/middleware/common';
-import { safeParseInt } from '@/lib/utils.edge';
+import { safeParseInt } from '@/lib/utils.nodeps';
 import { Database } from '@/types/supabase';
 import { DbFileWithoutContent, Project } from '@/types/types';
 

@@ -14,7 +14,7 @@ import {
 import {
   createServiceRoleSupabaseClient,
   getChecksums,
-  getOrCreateSource,
+  getOrCreateUploadOrAPISource,
   getProjectConfigData,
   getProjectTeam,
 } from '@/lib/supabase';
@@ -243,11 +243,10 @@ export default async function handler(
     }
   }
 
-  const sourceId = await getOrCreateSource(
+  const sourceId = await getOrCreateUploadOrAPISource(
     supabaseAdmin,
     projectId,
     'api-upload',
-    undefined,
   );
   const checksums = await getChecksums(supabaseAdmin, sourceId);
 

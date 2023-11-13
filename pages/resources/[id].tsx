@@ -29,9 +29,7 @@ const ResourcesPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
   return (
     <>
       <SharedHead
-        title={`${
-          frontmatter.shortTitle || frontmatter.title
-        } | Markprompt Resources`}
+        title={`${frontmatter.shortTitle || frontmatter.title}`}
         description={frontmatter.description}
         ogImage={
           frontmatter['og:image'] ||

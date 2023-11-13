@@ -3,7 +3,7 @@ integrations:
   salesforce:
     salesforce-articles:
       type: sync
-      runs: every day
+      runs: every week
       auto_start: false
       returns:
         - NangoFile
@@ -11,50 +11,63 @@ integrations:
   salesforce-sandbox:
     salesforce-articles:
       type: sync
-      runs: every day
+      runs: every week
       auto_start: false
       returns:
         - NangoFile
   salesforce-knowledge:
     salesforce-knowledge:
       type: sync
-      runs: every day
+      runs: every week
       auto_start: false
       returns:
         - NangoFile
   salesforce-knowledge-sandbox:
     salesforce-knowledge-sandbox:
       type: sync
-      runs: every day
+      runs: every week
+      track_deletes: true
       auto_start: false
       returns:
         - NangoFile
   salesforce-case:
     salesforce-case:
       type: sync
-      runs: every day
+      runs: every week
+      track_deletes: true
       auto_start: false
       returns:
         - NangoFile
   salesforce-case-sandbox:
     salesforce-case-sandbox:
       type: sync
-      runs: every day
+      runs: every week
+      track_deletes: true
       auto_start: false
       returns:
         - NangoFile
   notion-pages:
     notion-pages:
       type: sync
-      runs: every day
+      runs: every week
+      track_deletes: true
+      auto_start: false
+      returns:
+        - NangoFile
+  website-pages:
+    website-pages:
+      type: sync
+      runs: every week
+      track_deletes: true
+      auto_start: false
       returns:
         - NangoFile
 models:
   NangoFile:
     id: string
     path: string
-    title: string
-    content: string
-    contentType: string
-    meta: object
-    last_modified: string
+    title: string | undefined
+    content: string | undefined
+    contentType: string | undefined
+    meta: object | undefined
+    error: string | undefined

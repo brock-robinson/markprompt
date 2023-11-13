@@ -10,7 +10,7 @@ import InsightsMiddleware from './lib/middleware/insights';
 import SearchMiddleware from './lib/middleware/search';
 import MatchSectionsMiddleware from './lib/middleware/sections';
 import TrainMiddleware from './lib/middleware/train';
-import { getAppHost } from './lib/utils.edge';
+import { getAppHost } from './lib/utils.nodeps';
 
 export const config = {
   matcher: [

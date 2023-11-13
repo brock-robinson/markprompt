@@ -1,8 +1,11 @@
+import dynamic from 'next/dynamic';
 import { FC, ReactNode } from 'react';
 
 import { AppNavbar } from '@/components/layouts/AppNavbar';
 
-import PlanPickerDialog from '../team/PlanPickerDialog';
+const PlanPickerDialog = dynamic(() => import('../team/PlanPickerDialog'), {
+  loading: () => <></>,
+});
 
 type NavLayoutProps = {
   animated?: boolean;

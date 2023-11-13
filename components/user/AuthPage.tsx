@@ -10,7 +10,7 @@ import Button from '@/components/ui/Button';
 import emitter, { EVENT_OPEN_CONTACT } from '@/lib/events';
 import useUser from '@/lib/hooks/use-user';
 import { getPublicAnonSupabase } from '@/lib/supabase';
-import { getAppOrigin } from '@/lib/utils.edge';
+import { getAppOrigin } from '@/lib/utils.nodeps';
 
 import { ContactWindow } from './ChatWindow';
 

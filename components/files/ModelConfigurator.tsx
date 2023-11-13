@@ -2,7 +2,7 @@ import * as Accordion from '@radix-ui/react-accordion';
 import { Info } from 'lucide-react';
 import Link from 'next/link';
 import { ChangeEvent, FC, useMemo } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import {
   isDefaultMarkpromptModelConfiguration,
@@ -13,11 +13,11 @@ import useTeam from '@/lib/hooks/use-team';
 import { canConfigureModel } from '@/lib/stripe/tiers';
 
 import { ModelPicker } from './ModelPicker';
-import { Row } from './PlaygroundDashboard';
 import { SystemPromptPicker } from './SystemPromptPicker';
 import { UpgradeNote } from './UpgradeNote';
 import { AccordionContent, AccordionTrigger } from '../ui/Accordion';
 import Button, { ButtonOrLinkWrapper } from '../ui/Button';
+import { Row } from '../ui/Row';
 import { SliderInput } from '../ui/SliderInput';
 import { Tag } from '../ui/Tag';
 import { NoAutoTextArea } from '../ui/TextArea';
@@ -81,7 +81,7 @@ const ModelConfigurator: FC<ModelConfiguratorProps> = () => {
       <div className="mt-1 flex w-full flex-col">
         <NoAutoTextArea
           value={markpromptOptions.prompt?.systemPrompt}
-          className="h-[220px] w-full"
+          className="h-[360px] w-full"
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
             setMarkpromptOptions({
               ...markpromptOptions,

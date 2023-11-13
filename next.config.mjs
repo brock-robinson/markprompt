@@ -6,13 +6,6 @@ const withBundleAnalyzer = analyze({
   enabled: process.env.ANALYZE === 'true',
 });
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-// const withMDX = require('@next/mdx')({
-//   extension: /\.mdx?$/,
-//   options: {
-//     remarkPlugins: [remarkGfm],
-//   },
-// });
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {

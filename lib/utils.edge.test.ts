@@ -10,9 +10,6 @@ import {
   isAppHost,
   isRequestFromMarkprompt,
   removeSchema,
-  safeParseInt,
-  safeParseIntOrUndefined,
-  safeParseJSON,
 } from './utils.edge';
 
 describe('utils.edge', () => {
@@ -73,43 +70,6 @@ describe('utils.edge', () => {
       expect(getDomain('https://www.example.com')).toBe('example.com');
       expect(getDomain('localhost:3000')).toBe('localhost');
       expect(getDomain('www.example.com')).toBe('example.com');
-    });
-  });
-
-  describe('safeParseInt', () => {
-    it('should parse a string into an int', () => {
-      expect(safeParseInt('123', 234)).toBe(123);
-      expect(safeParseInt('blabla', 234)).toBe(234);
-      expect(safeParseInt(1 as any, 234)).toBe(234);
-    });
-  });
-
-  describe('safeParseIntOrUndefined', () => {
-    it('should parse a string into an int', () => {
-      expect(safeParseIntOrUndefined('123')).toBe(123);
-    });
-    it('should return undefined on non-string input', () => {
-      expect(safeParseIntOrUndefined(undefined)).toBe(undefined);
-      expect(safeParseIntOrUndefined('blabla')).toBe(undefined);
-      expect(safeParseIntOrUndefined(123 as any)).toBe(undefined);
-    });
-  });
-
-  describe('safeParseJSON', () => {
-    it('should parse a JSON string', () => {
-      expect(safeParseJSON(1 as any, { status: 'error' })).toStrictEqual({
-        status: 'error',
-      });
-      expect(
-        safeParseJSON('{ "a": 1, "b" : { "c": "d" } }', {
-          status: 'error',
-        }),
-      ).toStrictEqual({ a: 1, b: { c: 'd' } });
-      expect(
-        safeParseJSON('non-json', {
-          status: 'error',
-        }),
-      ).toStrictEqual({ status: 'error' });
     });
   });
 

@@ -43,7 +43,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['next.config.js', 'tailwind.config.js'],
+      files: ['next.config.mjs', 'tailwind.config.js'],
       rules: {
         '@typescript-eslint/no-var-requires': 'off',
       },

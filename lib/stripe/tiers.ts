@@ -7,8 +7,7 @@ import {
   UsagePeriod,
 } from '@/types/types';
 
-import { deepMerge } from '../utils.edge';
-import { roundToLowerOrderDecimal } from '../utils.nodeps';
+import { deepMerge, roundToLowerOrderDecimal } from '../utils.nodeps';
 
 type Price = {
   amount: number;
@@ -37,6 +36,7 @@ export type TierDetails = {
     sectionsAPI?: { enabled: boolean };
     customModelConfig?: { enabled: boolean };
     customPageFetcher?: { enabled: boolean };
+    autoSync?: { enabled: boolean };
     canRemoveBranding?: boolean;
   };
   maxProjects?: number;
@@ -326,6 +326,20 @@ export const canViewInsights = (teamTierInfo: TeamTierInfo) => {
   return insightsType === 'basic' || insightsType === 'advanced';
 };
 
+export const canAccessSectionsAPI = (teamTierInfo: TeamTierInfo): boolean => {
+  return !!getTierDetails(teamTierInfo).features?.sectionsAPI?.enabled;
+};
+
+export const canUseCustomModelConfig = (
+  teamTierInfo: TeamTierInfo,
+): boolean => {
+  return !!getTierDetails(teamTierInfo).features?.customModelConfig?.enabled;
+};
+
+export const isAutoSyncAccessible = (teamTierInfo: TeamTierInfo): boolean => {
+  return !!getTierDetails(teamTierInfo).features?.autoSync?.enabled;
+};
+
 export const getAccessibleInsightsType = (
   teamTierInfo: TeamTierInfo,
 ): InsightsType | undefined => {
@@ -349,16 +363,6 @@ export const getCompletionsAllowance = (
   }
   const usagePeriod = quotas?.usagePeriod || 'monthly';
   return { completions, usagePeriod };
-};
-
-export const canAccessSectionsAPI = (teamTierInfo: TeamTierInfo): boolean => {
-  return !!getTierDetails(teamTierInfo).features?.sectionsAPI?.enabled;
-};
-
-export const canUseCustomModelConfig = (
-  teamTierInfo: TeamTierInfo,
-): boolean => {
-  return !!getTierDetails(teamTierInfo).features?.customModelConfig?.enabled;
 };
 
 export const getEmbeddingTokensAllowance = (

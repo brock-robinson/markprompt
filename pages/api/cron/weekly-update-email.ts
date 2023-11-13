@@ -6,6 +6,11 @@ import { Resend } from 'resend';
 
 import InsightsEmail from '@/components/emails/Insights';
 import {
+  ProjectUsageStats,
+  TeamUsageStats,
+  UserUsageStats,
+} from '@/components/insights/UserUsageStats';
+import {
   getEmbeddingTokensAllowance,
   getCompletionsAllowance,
   getTier,
@@ -23,7 +28,6 @@ import {
 } from '@/lib/utils';
 import { Database } from '@/types/supabase';
 import {
-  CompletionsAllowances,
   DbTeam,
   DbUser,
   Project,
@@ -44,34 +48,6 @@ const allowedMethods = ['GET'];
 
 // Admin access to Supabase, bypassing RLS.
 const supabaseAdmin = createServiceRoleSupabaseClient();
-
-export type UserUsageStats = {
-  teamUsageStats: TeamUsageStats[];
-};
-
-type TeamUsageStats = {
-  name: string;
-  slug: string;
-  tierName: string;
-  usagePeriod: UsagePeriod;
-  numAllowedEmbeddings: number;
-  projectUsageStats: ProjectUsageStats[];
-};
-
-type ProjectUsageStats = {
-  name: string;
-  slug: string;
-  numEmbeddingTokens: number;
-  numFiles: number;
-  numSections: number;
-  latestQuestions: string[];
-  unansweredQuestions: string[];
-  numQuestionsAsked: number;
-  numQuestionsUnanswered: number;
-  numQuestionsDownvoted: number;
-  numQuestionsUpvoted: number;
-  mostCitedSources: string[];
-};
 
 const sanitizeQuestion = (question: string) => {
   // Replace emails and phone numbers with with [REDACTED]

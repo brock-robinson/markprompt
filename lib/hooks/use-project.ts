@@ -11,6 +11,7 @@ import { getMarkpromptConfigOrDefault } from '../utils.browser';
 export default function useProject() {
   const router = useRouter();
   const { projects } = useProjects();
+
   const projectId = useMemo(() => {
     return projects?.find((t) => t.slug === router.query.project)?.id;
   }, [projects, router.query?.project]);

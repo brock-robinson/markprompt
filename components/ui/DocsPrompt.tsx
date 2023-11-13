@@ -8,7 +8,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { FC, ReactNode, useEffect, useState } from 'react';
 import colors from 'tailwindcss/colors';
 
-import { getApiUrl } from '@/lib/utils.edge';
+import { getApiUrl } from '@/lib/utils.nodeps';
 
 import tailwindConfig from '../../tailwind.config';
 import '@markprompt/css';

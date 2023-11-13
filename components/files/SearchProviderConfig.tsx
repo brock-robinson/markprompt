@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { ChangeEvent, FC } from 'react';
 
 import { useConfigContext } from '@/lib/context/config';
-import { safeParseJSON } from '@/lib/utils.edge';
+import { safeParseJSON } from '@/lib/utils.nodeps';
 
-import { Row } from './PlaygroundDashboard';
 import Input from '../ui/Input';
+import { Row } from '../ui/Row';
 import { SelectItem } from '../ui/Select';
 import { NoAutoTextArea } from '../ui/TextArea';
 
@@ -104,9 +104,8 @@ export const SearchProviderConfig: FC<SearchProviderConfigProps> = () => {
           <Row fullWidth>
             <div className="mt-2 flex w-full flex-col">
               <p className="rounded border border-dashed border-orange-900/50 bg-orange-900/20 p-3 text-xs text-orange-400">
-                The Markprompt search provider is experimental. Retraining with
-                the &ldquo;force retrain&rdquo; option may be required to make
-                your content available for search.
+                The Markprompt search provider is experimental. Re-syncing your
+                sources may be required.
               </p>
             </div>
           </Row>

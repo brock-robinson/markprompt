@@ -8,7 +8,6 @@ import {
   Sparkles,
   Timer,
 } from 'lucide-react';
-import Link from 'next/link';
 import { FC, JSXElementConstructor, ReactNode } from 'react';
 import Balancer from 'react-wrap-balancer';
 
@@ -21,26 +20,26 @@ import { ZendeskIcon } from '@/components/icons/brands/Zendesk';
 import { CalIcon } from '@/components/icons/Cal';
 import { DiscordIcon } from '@/components/icons/Discord';
 import { GitHubIcon } from '@/components/icons/GitHub';
-import { XIcon } from '@/components/icons/X';
 import LandingNavbar from '@/components/layouts/LandingNavbar';
 import Button from '@/components/ui/Button';
 import { Pattern } from '@/components/ui/Pattern';
 import { SystemStatus } from '@/types/types';
 
+import Footer from './Footer';
 import { SharedHead } from './SharedHead';
 import { HubSpotIcon } from '../icons/brands/HubSpotIcon';
+import { YCIcon } from '../icons/brands/YC';
 import { PlotlyIcon } from '../icons/Plotly';
 import { SemgrepIcon } from '../icons/Semgrep';
 import { SkeduloIcon } from '../icons/Skedulo';
 import { Blurs } from '../ui/Blurs';
 import { SystemStatusButton } from '../ui/SystemStatusButton';
-import { ContactWindow } from '../user/ChatWindow';
 
-export const S = ({ children }: { children: ReactNode }) => {
+const S = ({ children }: { children: ReactNode }) => {
   return <span className="text-neutral-300">{children}</span>;
 };
 
-export const GoalList = ({ children }: { children: ReactNode }) => {
+const GoalList = ({ children }: { children: ReactNode }) => {
   return (
     <div className="mt-12 rounded-lg border border-dashed border-neutral-900 bg-neutral-1000 px-4 py-6 sm:py-8">
       <div className="relative mx-auto grid max-w-screen-lg grid-cols-1 gap-4 sm:grid-cols-3">
@@ -50,7 +49,7 @@ export const GoalList = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const Goal = ({ children }: { children: ReactNode }) => {
+const Goal = ({ children }: { children: ReactNode }) => {
   return (
     <div className="flex flex-row items-center gap-4 text-base font-medium sm:justify-center">
       <Check className="h-5 w-5 text-green-400 sm:h-6 sm:w-6" />
@@ -59,7 +58,7 @@ export const Goal = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const FeatureCard = ({
+const FeatureCard = ({
   Icon,
   title,
   description,
@@ -84,17 +83,13 @@ type LandingPageProps = {
   status: SystemStatus;
 };
 
-const formatNumStars = (stars: number) => {
-  if (stars > 1000) {
-    return `${(stars / 1000).toFixed(1)}k`;
-  }
-  return stars;
-};
-
 const LandingPage: FC<LandingPageProps> = ({ stars, status }) => {
   return (
     <>
-      <SharedHead title="Markprompt | AI for customer support" />
+      <SharedHead
+        title="Markprompt | AI for customer support"
+        exludePostfixFromTitle
+      />
       {/* <div className="z-40 bg-fuchsia-700 py-1.5 px-6 sm:px-8">
         <Link
           href="/blog/markprompt-qa"
@@ -159,6 +154,15 @@ const LandingPage: FC<LandingPageProps> = ({ stars, status }) => {
                   <SkeduloIcon className="w-[96px] text-neutral-500 sm:w-[110px]" />
                 </div>
               </div>
+              {/* <p className="pt-6 text-left text-sm text-neutral-700 sm:text-base">
+                Backed by
+              </p>
+              <div className="mt-3 flex flex-row items-center gap-2">
+                <YCIcon className="h-7 w-7" />
+                <span className="bg-gradient-to-br from-white to-neutral-100/50 bg-clip-text text-base font-medium leading-[1.6] text-transparent">
+                  Combinator
+                </span>
+              </div> */}
             </div>
             <div className="z-0 col-span-2 hidden h-full sm:block">
               <div className="animate-scale-bounce ml-[-100px] mt-[5%] block h-[90%] w-[calc(100%+200px)] transform-gpu">
@@ -252,7 +256,6 @@ const LandingPage: FC<LandingPageProps> = ({ stars, status }) => {
               </>
             }
           />
-
           <FeatureCard
             Icon={Timer}
             title="Instant responses"
@@ -285,7 +288,6 @@ const LandingPage: FC<LandingPageProps> = ({ stars, status }) => {
         </GoalList>
       </div>
       {/* <VideoSection /> */}
-      {/* <StepsSection /> */}
       <div className="relative z-0 mx-auto mt-32 max-w-screen-xl px-6 sm:px-8 sm:pt-0">
         {/* <div className="rounded-lg border border-dashed border-neutral-900 bg-neutral-1000/60 px-4 py-12 sm:px-8"> */}
         <div className="px-4 py-12 sm:px-8">
@@ -334,50 +336,7 @@ const LandingPage: FC<LandingPageProps> = ({ stars, status }) => {
           </Button>
         </div>
       </div>
-      <div className="relative z-0 mx-auto max-w-screen-xl px-6 pt-8 sm:px-8 sm:pt-16">
-        <div className="mt-20 grid grid-cols-1 items-center gap-8 border-t border-neutral-900/50 px-6 pt-12 pb-20 sm:mt-36 sm:py-12 sm:px-8 lg:grid-cols-3">
-          <div className="flex flex-row items-center justify-center gap-6 text-sm text-neutral-500 lg:justify-start">
-            <SystemStatusButton status={status} />
-            <Link href="/legal/terms">Terms</Link>
-            <Link href="/legal/privacy">Privacy</Link>
-            <a
-              href="https://github.com/orgs/motifland/projects/3/views/3"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Roadmap
-            </a>
-          </div>
-          <div className="hidden flex-row items-baseline justify-center gap-1 text-center text-sm text-neutral-500 lg:flex"></div>
-          <div className="mr-0 flex flex-row items-center justify-center gap-4 text-neutral-700 lg:justify-end">
-            <Button
-              variant="plain"
-              buttonSize="sm"
-              href="https://github.com/motifland/markprompt"
-              Icon={GitHubIcon}
-            >
-              Star on GitHub
-              <span className="ml-2 text-neutral-600">
-                {formatNumStars(stars)}
-              </span>
-            </Button>
-            <a
-              className="transition hover:text-neutral-500"
-              href="https://x.com/markprompt"
-              aria-label="Markprompt on X"
-            >
-              <XIcon className="h-5 w-5" />
-            </a>
-            <a
-              className="transition hover:text-neutral-500"
-              href="https://discord.gg/MBMh4apz6X"
-              aria-label="Markprompt on Discord"
-            >
-              <DiscordIcon className="h-5 w-5" />
-            </a>
-          </div>
-        </div>
-      </div>
+      <Footer stars={stars} status={status} />
     </>
   );
 };

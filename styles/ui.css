@@ -1,17 +1,20 @@
 .RadioGroupRoot {
+}
+
+.RadioGroupRootColumnLayout {
   @apply flex flex-col gap-1;
 }
 
-.RadioGroupItem {
-  @apply h-3.5 w-3.5 rounded-full border border-neutral-700 bg-neutral-900 transition;
+.RadioGroupRootRowLayout {
+  @apply flex flex-row items-center;
 }
 
-.RadioGroupItem:hover {
-  @apply border-neutral-600 bg-neutral-700;
+.RadioGroupItem {
+  @apply h-3.5 w-3.5 rounded-full border border-neutral-700 bg-neutral-900 transition hover:border-neutral-600 hover:bg-neutral-700;
 }
 
 .RadioGroupItem:focus {
-  @apply border-sky-500;
+  @apply border-sky-500 disabled:border-sky-500;
 }
 
 .RadioGroupIndicator {
@@ -19,10 +22,101 @@
 }
 
 .RadioGroupIndicator::after {
-  @apply block h-2 w-2 rounded-full bg-sky-500;
+  @apply block h-2 w-2 rounded-full bg-sky-500 disabled:bg-neutral-500;
   content: '';
+}
+
+.RadioGroupRoot[data-disabled] {
+  @apply pointer-events-none cursor-not-allowed;
+}
+
+.RadioGroupRoot[data-disabled] .RadioGroupItem {
+  @apply cursor-not-allowed border-neutral-800 text-neutral-500;
+}
+
+.RadioGroupRoot[data-disabled] .RadioGroupIndicator::after {
+  @apply bg-neutral-800;
+}
+
+.RadioGroupRoot[data-disabled] label {
+  @apply cursor-not-allowed text-neutral-600;
 }
 
 .Label {
   @apply cursor-pointer select-none text-sm text-neutral-300;
+}
+
+/* Tabs */
+
+.TabsRoot {
+  @apply flex flex-col;
+}
+
+.TabsList {
+  @apply flex shrink-0 border-b border-neutral-900;
+}
+
+.TabsListSegmented {
+  @apply flex shrink-0 overflow-hidden rounded-md border border-neutral-800 bg-neutral-1000;
+}
+
+.TabsTrigger {
+  @apply flex flex-1 select-none flex-row items-center justify-center overflow-hidden truncate outline-none transition;
+}
+
+.TabsList .TabsTrigger {
+  @apply border-b-2 border-transparent border-white px-4 pt-2 pb-2 text-sm font-medium;
+}
+
+.TabsListSegmented .TabsTrigger {
+  @apply px-4 py-1.5 text-sm font-medium;
+}
+
+.TabsTrigger:hover {
+  @apply bg-neutral-900/30 text-neutral-300;
+}
+
+.TabsTrigger:not([data-state='active']) {
+  @apply border-transparent text-neutral-500;
+}
+
+.TabsTrigger[data-state='active'] {
+  @apply border-neutral-500 bg-neutral-900 text-neutral-100;
+}
+
+.TabsTrigger:focus {
+  @apply border-neutral-500;
+}
+
+.TabsContent {
+  @apply flex-grow outline-none;
+}
+
+/* Forms */
+
+.FormRoot {
+  @apply flex flex-col gap-4;
+}
+
+.FormField {
+  @apply flex flex-col gap-2;
+}
+
+.FormLabel {
+  @apply text-xs font-medium text-neutral-300;
+}
+
+.FormRowLegend {
+  @apply text-sm text-neutral-300;
+}
+
+.FormHeadingGroup {
+  @apply mt-2 flex flex-col gap-1 border-t border-neutral-900 pt-2;
+}
+
+.FormHeading {
+  @apply mt-4 text-sm font-medium;
+}
+.FormSubheading {
+  @apply text-sm text-neutral-500;
 }

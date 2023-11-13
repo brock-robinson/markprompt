@@ -2,7 +2,7 @@ import { add, endOfWeek, format, startOfWeek } from 'date-fns';
 import { GetStaticProps, InferGetStaticPropsType } from 'next';
 import dynamic from 'next/dynamic';
 import { FC, useCallback, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import { PreviewWrapper } from '@/components/emails/PreviewWrapper';
 import { sampleUserUsageStats } from '@/lib/samples/data';

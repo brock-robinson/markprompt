@@ -162,7 +162,7 @@ export function QueriesDataTable<TData, TValue>({
               }
               className="max-w-sm"
             />
-            <SkeletonPanel onDark loading={loading} />
+            <SkeletonPanel onDark absolute loading={loading} />
           </div>
         )}
         {/* <DropdownMenu.Root>
@@ -255,7 +255,7 @@ export function QueriesDataTable<TData, TValue>({
       </div>
       <div className="py-4">
         <div className="relative flex items-center justify-end">
-          <SkeletonPanel onDark loading={loading} />
+          <SkeletonPanel onDark absolute loading={loading} />
           {/* <div className="flex-1 text-sm text-neutral-500">
             {table.getFilteredSelectedRowModel().rows.length} of{' '}
             {table.getFilteredRowModel().rows.length} row(s) selected. Insights

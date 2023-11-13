@@ -7,7 +7,7 @@ import {
   FormikValues,
 } from 'formik';
 import { useRouter } from 'next/router';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import { TeamSettingsLayout } from '@/components/layouts/TeamSettingsLayout';
 import Button from '@/components/ui/Button';
@@ -16,7 +16,7 @@ import { NoAutoInput } from '@/components/ui/Input';
 import { createProject } from '@/lib/api';
 import useProjects from '@/lib/hooks/use-projects';
 import useTeam from '@/lib/hooks/use-team';
-import { showConfetti } from '@/lib/utils';
+import { showConfetti } from '@/lib/ui';
 
 const NewProject = () => {
   const router = useRouter();

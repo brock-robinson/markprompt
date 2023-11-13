@@ -18,6 +18,8 @@ const DocsPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
       <SharedHead
         title="Markprompt Docs"
         ogImage="https://markprompt.com/static/cover-docs.png"
+        section="docs"
+        exludePostfixFromTitle
       />
       <DocsLayout content={JSON.parse(content)} toc={toc} />
     </>

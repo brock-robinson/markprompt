@@ -14,6 +14,7 @@ module.exports = {
       colors: {
         primary: colors.fuchsia,
         neutral: {
+          950: '#121212',
           1000: '#0E0E0E',
           1100: '#050505',
         },

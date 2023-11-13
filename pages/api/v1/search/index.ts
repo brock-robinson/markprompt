@@ -11,7 +11,7 @@ import {
   inferFileTitle,
   stripMarkdown,
 } from '@/lib/utils';
-import { safeParseInt, safeParseJSON } from '@/lib/utils.edge';
+import { safeParseInt, safeParseJSON } from '@/lib/utils.nodeps';
 import { Database } from '@/types/supabase';
 import { FileSectionMeta, Project } from '@/types/types';
 

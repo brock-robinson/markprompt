@@ -45,52 +45,6 @@ export const getDomain = (url: string) => {
   return domain;
 };
 
-export const safeParseInt = (
-  value: string | undefined | null,
-  fallbackValue: number,
-): number => {
-  if (typeof value !== 'string') {
-    return fallbackValue;
-  }
-
-  const parsedInt = parseInt(value);
-  if (isNaN(parsedInt)) {
-    return fallbackValue;
-  }
-  return parsedInt;
-};
-
-export const safeParseIntOrUndefined = (
-  value: string | undefined | null,
-): number | undefined => {
-  if (typeof value !== 'string') {
-    return undefined;
-  }
-
-  const parsedInt = parseInt(value);
-  if (isNaN(parsedInt)) {
-    return undefined;
-  }
-  return parsedInt;
-};
-
-export const safeParseJSON = <T>(
-  value: string | undefined | null,
-  fallbackValue: T,
-): T => {
-  if (typeof value !== 'string') {
-    return fallbackValue;
-  }
-
-  try {
-    return JSON.parse(value);
-  } catch {
-    //
-  }
-
-  return fallbackValue;
-};
-
 export const isRequestFromMarkprompt = (origin: string | undefined | null) => {
   const requesterHost = origin && removeSchema(origin);
   return requesterHost === getAppHost();

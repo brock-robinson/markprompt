@@ -1,7 +1,7 @@
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import Router from 'next/router';
 import { useCallback } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import useSWR, { useSWRConfig } from 'swr';
 
 import { DbUser } from '@/types/types';

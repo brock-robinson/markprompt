@@ -1,9 +1,12 @@
 import * as Dialog from '@radix-ui/react-dialog';
+import dynamic from 'next/dynamic';
 import { FC, ReactNode, useEffect, useState } from 'react';
 
 import emitter, { EVENT_OPEN_PLAN_PICKER_DIALOG } from '@/lib/events';
 
-import PlanPicker from './PlanPicker';
+const PlanPicker = dynamic(() => import('./PlanPicker'), {
+  loading: () => <></>,
+});
 
 type PlanPickerDialogProps = {
   children?: ReactNode;

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { createServiceRoleSupabaseClient, getQueryStats } from '@/lib/supabase';
-import { safeParseInt } from '@/lib/utils.edge';
+import { safeParseInt } from '@/lib/utils.nodeps';
 import { PromptQueryStat } from '@/types/types';
 
 // Admin access to Supabase, bypassing RLS.

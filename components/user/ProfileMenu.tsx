@@ -58,7 +58,7 @@ const ProfileMenu = () => {
               </div>
             </DropdownMenu.Label>
           )}
-          {personalTeam && user?.has_completed_onboarding && (
+          {personalTeam && (
             <>
               <DropdownMenu.Separator className="dropdown-menu-separator" />
               <DropdownMenu.Item asChild>

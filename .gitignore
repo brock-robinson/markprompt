@@ -41,3 +41,4 @@ next-env.d.ts
 temp/
 out.txt
 external/nango-integrations/out.txt
+external/nango-integrations/dist/

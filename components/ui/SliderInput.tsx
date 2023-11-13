@@ -3,7 +3,7 @@ import cn from 'classnames';
 import { ChangeEvent, FC } from 'react';
 
 import Input from './Input';
-import { Row } from '../files/PlaygroundDashboard';
+import { Row } from './Row';
 
 type SliderInputProps = {
   label: string;

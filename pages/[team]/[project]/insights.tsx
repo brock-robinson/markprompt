@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Card } from '@/components/dashboard/Card';
+import { PromptStatusTag } from '@/components/insights/PromptStatusTag';
 import { QueriesDataTable } from '@/components/insights/queries/table';
 import { QueriesHistogram } from '@/components/insights/queries-histogram';
 import { TopReferences } from '@/components/insights/top-references';
@@ -35,14 +36,6 @@ const ConversationDialog = dynamic(
     loading: () => Loading,
   },
 );
-
-export const PromptStatusTag = ({ noResponse }: { noResponse: boolean }) => {
-  return (
-    <Tag color={noResponse ? 'orange' : 'green'}>
-      {noResponse ? 'No response' : 'Answered'}
-    </Tag>
-  );
-};
 
 const Insights = () => {
   const { project } = useProject();
@@ -305,10 +298,8 @@ const Insights = () => {
         return;
       }
       try {
-        console.debug('Start processing query stats');
         const res = await processQueryStats(project.id);
         await mutateQueries();
-        console.debug('Process query stats response:', JSON.stringify(res));
 
         if (res.allProcessed) {
           setProcessingQueryStats(false);
